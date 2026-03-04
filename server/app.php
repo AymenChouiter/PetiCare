@@ -1,2 +1,23 @@
 <?php
-echo "slamo 3alykom";
+/*
+require the twig environment.
+*/
+require_once '../vendor/autoload.php';
+$loader = new \Twig\Loader\FilesystemLoader('../public');
+$twig = new \Twig\Environment($loader);
+
+/*
+after start the hosting by "php -S localhost:4000" in the '/ACC' file
+open the 'http://localhost:4000/server/app.php'
+*/
+
+echo $twig->render('ssr.html', [
+    'name' => 'farouk',
+    'age'  => 20
+]);
+
+/*explain :
+this app waitig for get req by 'http://localhost:4000/server/app.php'
+after that get into the '/ACC/public/ssr.html' make change in the '{{  }}' field
+and render the result
+*/
