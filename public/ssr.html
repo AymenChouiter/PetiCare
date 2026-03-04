@@ -6,10 +6,10 @@
     <title>ssr</title>
 </head>
 <body>
-    hello {{$ name }} ! your {{$ age }}?
+    hello {{ name }} ! your are {{ age }}?
     <br>
-    {if age > 18 }
-        {{$user}} you are +18 .LOL
+    {if age => 18 }
+        {{user}} you are +18 .LOL
     { endif }
 </body>
 </html>
