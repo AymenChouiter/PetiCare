@@ -6,10 +6,12 @@
     <title>ssr</title>
 </head>
 <body>
-    hello {{ name }} ! your are {{ age }}?
-    <br>
-    {if age => 18 }
-        {{user}} you are +18 .LOL
-    { endif }
+    <form action="../server/index.php" method="post">
+        <input type="number" name="num1">
+        <input type="submit">
+    </form>
 </body>
+<?php
+    include "../server/index.php";
+?>
 </html>
