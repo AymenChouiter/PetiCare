@@ -12,6 +12,6 @@
     </form>
 </body>
 <?php
-    include "../server/index.php";
+    include "./index.php"
 ?>
 </html>
