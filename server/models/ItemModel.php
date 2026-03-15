@@ -2,20 +2,15 @@
 
 require_once __DIR__ . '/../controller/database.php';
 
-class ItemModel
-{
+class ItemModel{
     /**
      * @var mysqli
-     */
-    private $conn;
-
-    /**
      * @var string
      */
+    private $conn;
     private $table = '`animal-information`';
 
-    public function __construct()
-    {
+    public function __construct(){
         // Use the global mysqli connection defined in database.php
         global $conn;
         $this->conn = $conn;
@@ -26,8 +21,7 @@ class ItemModel
      *
      * @return array|false
      */
-    public function all()
-    {
+    public function all(){
         $sql = "SELECT animalId, animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture, createdAt FROM {$this->table}";
         $result = $this->conn->query($sql);
 
@@ -47,8 +41,7 @@ class ItemModel
      * @param int $id
      * @return array|null
      */
-    public function find($id)
-    {
+    public function find($id){
         $sql = "SELECT animalId, animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture, createdAt FROM {$this->table} WHERE animalId = ?";
         $stmt = $this->conn->prepare($sql);
 
@@ -88,8 +81,7 @@ class ItemModel
      * @param array $data
      * @return array|false  Returns created animal on success, false on SQL error.
      */
-    public function create(array $data)
-    {
+    public function create(array $data){
         $sql = "INSERT INTO {$this->table} (animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
@@ -143,8 +135,7 @@ class ItemModel
      * @param array $data
      * @return array|null|false  Updated animal on success, null if not found, false on SQL error.
      */
-    public function update($id, array $data)
-    {
+    public function update($id, array $data){
         // Load existing record to support partial updates
         $existing = $this->find($id);
         if ($existing === null) {
@@ -211,8 +202,7 @@ class ItemModel
      * @param int $id
      * @return bool|null  true on delete, null if not found, false on SQL error.
      */
-    public function delete($id)
-    {
+    public function delete($id){
         $sql = "DELETE FROM {$this->table} WHERE animalId = ?";
         $stmt = $this->conn->prepare($sql);
 
@@ -243,4 +233,3 @@ class ItemModel
         return true;
     }
 }
-

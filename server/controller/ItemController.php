@@ -2,20 +2,16 @@
 
 require_once __DIR__ . '/../models/ItemModel.php';
 
-class ItemController
-{
+class ItemController{
     private ItemModel $model;
-
-    public function __construct()
-    {
+    public function __construct(){
         $this->model = new ItemModel();
     }
 
     /**
      * Render HTML page listing all animals and providing forms.
      */
-    public function index(): void
-    {
+    public function index(): void{
         $animals = $this->model->all();
 
         if ($animals === false) {
@@ -34,8 +30,7 @@ class ItemController
      * - If Content-Type is application/json, read JSON body.
      * - Otherwise use $_POST (form data).
      */
-    private function getRequestData(): array
-    {
+    private function getRequestData(): array{
         $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         if (stripos($contentType, 'application/json') !== false) {
@@ -56,8 +51,7 @@ class ItemController
     /**
      * Handle file upload for picture if present.
      */
-    private function extractPicture(): ?string
-    {
+    private function extractPicture(): ?string{
         if (!isset($_FILES['picture']) || !is_array($_FILES['picture'])) {
             return null;
         }
@@ -70,9 +64,8 @@ class ItemController
         return null;
     }
 
-    public function store(): void
-    {
-        header('Content-Type: application/json');
+    public function store(): void{
+        //header('Content-Type: application/json');
 
         $data = $this->getRequestData();
 
@@ -115,11 +108,12 @@ class ItemController
             'status' => 'success',
             'data'   => $animal,
         ]);
+
+        $this->index();
     }
 
-    public function update(): void
-    {
-        header('Content-Type: application/json');
+    public function update(): void{
+        //header('Content-Type: application/json');
 
         $data = $this->getRequestData();
 
@@ -195,11 +189,12 @@ class ItemController
             'status' => 'success',
             'data'   => $updated,
         ]);
+
+        $this->index();
     }
 
-    public function destroy(): void
-    {
-        header('Content-Type: application/json');
+    public function destroy(): void{
+        //header('Content-Type: application/json');
 
         $data = $this->getRequestData();
         $id   = $data['animalId'] ?? ($_GET['animalId'] ?? null);
@@ -238,6 +233,7 @@ class ItemController
             'status'  => 'success',
             'message' => 'Animal deleted successfully',
         ]);
+
+        $this->index();
     }
 }
-

@@ -35,6 +35,28 @@ if (($method === 'POST' && $path === '/delete') || ($method === 'DELETE' && $pat
 }
 
 // Existing home route - show animals and admin panel
+$path = rtrim($path, '/') ?: '/';
+$staticFile = __DIR__ . '/public' . $path;
+
+if (file_exists($staticFile) && is_file($staticFile)) {
+    $mime = [
+        'css'  => 'text/css',
+        'js'   => 'application/javascript',
+        'png'  => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'ico'  => 'image/x-icon',
+        'svg'  => 'image/svg+xml',
+        'woff' => 'font/woff',
+        'woff2'=> 'font/woff2',
+    ];
+
+    $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
+    header('Content-Type: ' . ($mime[$ext] ?? 'application/octet-stream'));
+    readfile($staticFile);
+    exit;
+}
+
 if ($method === 'GET' && ($path === '/' || $path === '/index.php')) {
     $controller = new ItemController();
     $controller->index();

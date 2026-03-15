@@ -1,9 +1,9 @@
 <?php
- $da_server = "127.0.0.1";
+ $da_server = "localhost";
  $da_user = "root";
  $da_pass = "";
  $db_name = "animal-care-center";
- $conn = "";
+ $conn = null;
  
  try{
     $conn = mysqli_connect(
