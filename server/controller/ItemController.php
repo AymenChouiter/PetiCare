@@ -25,6 +25,29 @@ class ItemController
             return;
         }
 
+        foreach ($animals as &$animal) {
+            $birth = new DateTime($animal['birth_date']);
+            $diff = (new DateTime())->diff($birth);
+            $animal['age'] = $diff->y . 'y ' . $diff->m . 'm';
+
+            $animal['gender'] = ucfirst(strtolower($animal['gender']));
+            $animal['health_status'] = ucfirst(strtolower($animal['health_status']));
+
+            // "UNDER_TREATMENT" -> "Under Treatment"
+            $lcHealth = strtolower($animal['health_status']);
+            $animal['health_status'] = ucwords(str_replace('_', ' ', $lcHealth));
+            $animal['health_class'] = str_replace('_', '-', $lcHealth);
+
+            $animal['adoption_status'] = ucfirst(strtolower($animal['adoption_status']));
+            $animal['adoption_fee'] = $animal['adoption_fee'] > 0
+                ? '$' . number_format($animal['adoption_fee'], 2)
+                : 'Free';
+
+            $animal['created_at'] = date('M d, Y', strtotime($animal['created_at']));
+            $animal['updated_at'] = date('M d, Y', strtotime($animal['updated_at']));
+        }
+        unset($animal);
+
         // Render the main admin page (HTML)
         require __DIR__ . '/../../public/index.php';
     }
@@ -82,7 +105,7 @@ class ItemController
             if (empty($data[$field])) {
                 http_response_code(400);
                 echo json_encode([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => $field . ' is required',
                 ]);
                 return;
@@ -91,7 +114,7 @@ class ItemController
 
         // Optional fields
         $data['description'] = $data['description'] ?? null;
-        $data['illnesses']   = $data['illnesses'] ?? null;
+        $data['illnesses'] = $data['illnesses'] ?? null;
 
         // Picture from upload (if any)
         $picture = $this->extractPicture();
@@ -104,7 +127,7 @@ class ItemController
         if ($animal === false) {
             http_response_code(500);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Failed to create animal',
             ]);
             return;
@@ -113,7 +136,7 @@ class ItemController
         http_response_code(201);
         echo json_encode([
             'status' => 'success',
-            'data'   => $animal,
+            'data' => $animal,
         ]);
     }
 
@@ -128,7 +151,7 @@ class ItemController
         if (empty($id)) {
             http_response_code(400);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'animalId is required',
             ]);
             return;
@@ -158,13 +181,13 @@ class ItemController
         $picture = $this->extractPicture();
         if ($picture !== null) {
             $data['picture'] = $picture;
-            $hasUpdateField  = true;
+            $hasUpdateField = true;
         }
 
         if (!$hasUpdateField) {
             http_response_code(400);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'At least one field must be provided for update',
             ]);
             return;
@@ -175,7 +198,7 @@ class ItemController
         if ($updated === false) {
             http_response_code(500);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Failed to update animal',
             ]);
             return;
@@ -184,7 +207,7 @@ class ItemController
         if ($updated === null) {
             http_response_code(400);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Animal not found',
             ]);
             return;
@@ -193,7 +216,7 @@ class ItemController
         http_response_code(200);
         echo json_encode([
             'status' => 'success',
-            'data'   => $updated,
+            'data' => $updated,
         ]);
     }
 
@@ -202,12 +225,12 @@ class ItemController
         header('Content-Type: application/json');
 
         $data = $this->getRequestData();
-        $id   = $data['animalId'] ?? ($_GET['animalId'] ?? null);
+        $id = $data['animalId'] ?? ($_GET['animalId'] ?? null);
 
         if (empty($id)) {
             http_response_code(400);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'animalId is required',
             ]);
             return;
@@ -218,7 +241,7 @@ class ItemController
         if ($deleted === false) {
             http_response_code(500);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Failed to delete animal',
             ]);
             return;
@@ -227,7 +250,7 @@ class ItemController
         if ($deleted === null) {
             http_response_code(400);
             echo json_encode([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Animal not found',
             ]);
             return;
@@ -235,7 +258,7 @@ class ItemController
 
         http_response_code(200);
         echo json_encode([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Animal deleted successfully',
         ]);
     }

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../controller/database.php';
+require_once __DIR__ . '/../../database/connection.php';
 
 class ItemModel
 {
@@ -12,7 +12,7 @@ class ItemModel
     /**
      * @var string
      */
-    private $table = '`animal-information`';
+    private $table = 'animals';
 
     public function __construct()
     {
@@ -28,7 +28,7 @@ class ItemModel
      */
     public function all()
     {
-        $sql = "SELECT animalId, animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture, createdAt FROM {$this->table}";
+        $sql = "SELECT id, name, species, gender, birth_date, description, health_status, adoption_fee, adoption_status, picture_blob, created_at, updated_at FROM {$this->table}";
         $result = $this->conn->query($sql);
 
         if ($result === false) {
@@ -98,29 +98,31 @@ class ItemModel
             return false;
         }
 
-        $animalName  = $data['animalName'] ?? null;
-        $species     = $data['species'] ?? null;
-        $gender      = $data['gender'] ?? null;
-        $animalAge   = $data['animalAge'] ?? null;
+        $animalName = $data['animalName'] ?? null;
+        $species = $data['species'] ?? null;
+        $gender = $data['gender'] ?? null;
+        $animalAge = $data['animalAge'] ?? null;
         $description = $data['description'] ?? null;
-        $illnesses   = $data['illnesses'] ?? null;
+        $illnesses = $data['illnesses'] ?? null;
         $animalPrice = $data['animalPrice'] ?? null;
-        $status      = $data['status'] ?? null;
-        $picture     = $data['picture'] ?? null;
+        $status = $data['status'] ?? null;
+        $picture = $data['picture'] ?? null;
 
         // Treat all as strings; MySQL will coerce numeric fields appropriately.
-        if (!$stmt->bind_param(
-            'sssssssss',
-            $animalName,
-            $species,
-            $gender,
-            $animalAge,
-            $description,
-            $illnesses,
-            $animalPrice,
-            $status,
-            $picture
-        )) {
+        if (
+            !$stmt->bind_param(
+                'sssssssss',
+                $animalName,
+                $species,
+                $gender,
+                $animalAge,
+                $description,
+                $illnesses,
+                $animalPrice,
+                $status,
+                $picture
+            )
+        ) {
             $stmt->close();
             return false;
         }
@@ -151,15 +153,15 @@ class ItemModel
             return null;
         }
 
-        $animalName  = array_key_exists('animalName', $data) ? $data['animalName'] : $existing['animalName'];
-        $species     = array_key_exists('species', $data) ? $data['species'] : $existing['species'];
-        $gender      = array_key_exists('gender', $data) ? $data['gender'] : $existing['gender'];
-        $animalAge   = array_key_exists('animalAge', $data) ? $data['animalAge'] : $existing['animalAge'];
+        $animalName = array_key_exists('animalName', $data) ? $data['animalName'] : $existing['animalName'];
+        $species = array_key_exists('species', $data) ? $data['species'] : $existing['species'];
+        $gender = array_key_exists('gender', $data) ? $data['gender'] : $existing['gender'];
+        $animalAge = array_key_exists('animalAge', $data) ? $data['animalAge'] : $existing['animalAge'];
         $description = array_key_exists('description', $data) ? $data['description'] : $existing['description'];
-        $illnesses   = array_key_exists('illnesses', $data) ? $data['illnesses'] : $existing['illnesses'];
+        $illnesses = array_key_exists('illnesses', $data) ? $data['illnesses'] : $existing['illnesses'];
         $animalPrice = array_key_exists('animalPrice', $data) ? $data['animalPrice'] : $existing['animalPrice'];
-        $status      = array_key_exists('status', $data) ? $data['status'] : $existing['status'];
-        $picture     = array_key_exists('picture', $data) ? $data['picture'] : $existing['picture'];
+        $status = array_key_exists('status', $data) ? $data['status'] : $existing['status'];
+        $picture = array_key_exists('picture', $data) ? $data['picture'] : $existing['picture'];
 
         $sql = "UPDATE {$this->table}
                 SET animalName = ?, species = ?, gender = ?, animalAge = ?, description = ?, illnesses = ?, animalPrice = ?, status = ?, picture = ?
@@ -172,19 +174,21 @@ class ItemModel
 
         $id = (int) $id;
 
-        if (!$stmt->bind_param(
-            'sssssssssi',
-            $animalName,
-            $species,
-            $gender,
-            $animalAge,
-            $description,
-            $illnesses,
-            $animalPrice,
-            $status,
-            $picture,
-            $id
-        )) {
+        if (
+            !$stmt->bind_param(
+                'sssssssssi',
+                $animalName,
+                $species,
+                $gender,
+                $animalAge,
+                $description,
+                $illnesses,
+                $animalPrice,
+                $status,
+                $picture,
+                $id
+            )
+        ) {
             $stmt->close();
             return false;
         }

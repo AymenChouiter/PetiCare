@@ -1,0 +1,365 @@
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Base */
+:root {
+  --primary: #308a77;
+  --primary-dark: #287363;
+  --primary-light: #e8f4f1;
+
+  --danger: #e63946;
+  --danger-dark: #c1121f;
+
+  --warning: #e07b2a;
+  --warning-dark: #c86a1d;
+
+  --background: #f8f8f8;
+  --surface: #ffffff;
+  --surface-raised: #f0f0f0;
+
+  --border-color: #dedede;
+  --border: 1px solid var(--border-color);
+
+  --foreground: #181818;
+  --text-muted: #6f6f6f;
+  --text-subtle: #a0a0a0;
+
+  --transition: 200ms ease;
+
+  /* Health Status */
+  --badge-healthy: #00c153;
+  --badge-treatment: #de8200;
+
+  /* Adoption Status */
+  --badge-available: #005ac9;
+  --badge-adopted: #626262;
+  --badge-reserved: #782aff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background-color: inherit;
+}
+
+input {
+  border: none;
+  outline: none;
+}
+
+select {
+  cursor: pointer;
+  outline: none;
+}
+
+iconify-icon {
+  font-size: 24px;
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Utilities */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Components */
+.btn {
+  padding-block: 0.75rem;
+  padding-inline: 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all var(--transition);
+}
+
+.btn--primary {
+  background-color: var(--primary);
+  color: #fefefe;
+}
+
+.btn--primary:hover {
+  background-color: var(--primary-dark);
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Header */
+.header {
+  background-color: var(--surface);
+  border-bottom: var(--border);
+  padding-block: 0.5rem;
+}
+
+.header__brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.header__logo {
+  width: 60px;
+}
+
+.header__title {
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Page-heade */
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block: 3rem;
+}
+
+.page-head__title {
+  font-size: 1.75rem;
+  margin-block-end: 0.5rem;
+}
+
+.page-head__desc {
+  color: var(--text-muted);
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Toolbar */
+.toolbar-container {
+  margin-block: 3rem;
+}
+.toolbar {
+  background-color: var(--surface);
+  padding-block: 0.75rem;
+  padding-inline: 1.25rem;
+  border: var(--border);
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.toolbar__search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: var(--border);
+  border-radius: 6px;
+  padding-inline: 0.75rem;
+  height: 2.5rem;
+  flex: 1;
+}
+
+.toolbar__search-input {
+  font-size: 0.875rem;
+}
+
+.toolbar__select {
+  font-family: inherit;
+  font-size: 0.875rem;
+  height: 2.5rem;
+  padding-inline-start: 0.75rem;
+  padding-inline-end: 2.5rem;
+  border: var(--border);
+  border-radius: 6px;
+  background-color: #fff;
+  transition: all var(--transition);
+
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236f6f6f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+}
+
+.toolbar__select:hover {
+  border-color: var(--primary);
+}
+
+.toolbar__select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(48, 138, 119, 0.15);
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Table */
+.table-container {
+  width: 100%;
+  border-radius: 8px;
+  border: var(--border);
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+  text-transform: capitalize;
+}
+
+.table__th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-bottom: var(--border);
+}
+
+.table__body {
+  background-color: var(--surface);
+}
+
+.table__td {
+  padding: 16px;
+  border-bottom: var(--border);
+  vertical-align: middle;
+  color: var(--text-muted);
+}
+
+.table__td--bold {
+  font-weight: 500;
+}
+
+.table__avatar {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table__avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.table__avatar > iconify-icon {
+  font-size: 32px;
+  color: var(--primary-dark);
+}
+
+.table__animal-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table__animal-meta {
+  max-width: 150px;
+}
+
+.table__animal-name {
+  display: block;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.table__animal-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.badge {
+  padding-block: 0.25rem;
+  padding-inline: 0.75rem;
+  border-radius: 99999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Health Status */
+.badge--health-healthy {
+  color: var(--badge-healthy);
+  background: color-mix(in srgb, var(--badge-healthy) 12%, white);
+}
+.badge--health-under-treatment {
+  color: var(--badge-treatment);
+  background: color-mix(in srgb, var(--badge-treatment) 12%, white);
+}
+
+/* Adoption Status */
+.badge--status-available {
+  color: var(--badge-available);
+  background: color-mix(in srgb, var(--badge-available) 12%, white);
+}
+.badge--status-adopted {
+  color: var(--badge-adopted);
+  background: color-mix(in srgb, var(--badge-adopted) 12%, white);
+}
+.badge--status-reserved {
+  color: var(--badge-reserved);
+  background: color-mix(in srgb, var(--badge-reserved) 12%, white);
+}
+
+.table__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table__timeline span {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.table__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn > iconify-icon {
+  font-size: 20px;
+}
+
+.action-btn--edit {
+  color: var(--warning);
+  transition: color var(--transition);
+}
+
+.action-btn--edit:hover {
+  color: var(--warning-dark);
+}
+
+.action-btn--delete {
+  color: var(--danger);
+  transition: color var(--transition);
+}
+
+.action-btn--delete:hover {
+  color: var(--danger-dark);
+}
