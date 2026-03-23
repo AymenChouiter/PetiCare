@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS animals (
   name            VARCHAR(100) NOT NULL,
   species         VARCHAR(100) NOT NULL,
   gender          ENUM('MALE', 'FEMALE') NOT NULL,
-  birth_date      DATE NOT NULL, 
+  birth_date      DATE, 
   description     TEXT, 
   health_status   ENUM('HEALTHY', 'UNDER_TREATMENT') NOT NULL DEFAULT 'HEALTHY', 
   adoption_fee    decimal(10,2) NOT NULL DEFAULT 0.00, 

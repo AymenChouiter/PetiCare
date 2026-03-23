@@ -12,7 +12,7 @@
 
   --background: #f8f8f8;
   --surface: #ffffff;
-  --surface-raised: #f0f0f0;
+  --surface-raised: #e1e1e1;
 
   --border-color: #dedede;
   --border: 1px solid var(--border-color);
@@ -62,14 +62,17 @@ button {
   background-color: inherit;
 }
 
-input {
+input,
+textarea {
   border: none;
   outline: none;
+  font-family: inherit;
 }
 
 select {
   cursor: pointer;
   outline: none;
+  font-family: inherit;
 }
 
 iconify-icon {
@@ -82,6 +85,10 @@ iconify-icon {
   max-width: 1280px;
   margin-inline: auto;
   padding-inline: 1.25rem;
+}
+
+body.no-scroll {
+  overflow: hidden;
 }
 
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Components */
@@ -98,11 +105,20 @@ iconify-icon {
 
 .btn--primary {
   background-color: var(--primary);
-  color: #fefefe;
+  color: var(--background);
 }
 
 .btn--primary:hover {
   background-color: var(--primary-dark);
+}
+
+.btn--secondary {
+  background: var(--surface-raised);
+  color: var(--foreground);
+}
+
+.btn--secondary:hover {
+  background-color: color-mix(in srgb, var(--surface-raised) 95%, black);
 }
 
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Header */
@@ -146,7 +162,7 @@ iconify-icon {
   color: var(--text-muted);
 }
 
-/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Toolbar */
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Toolbar */
 .toolbar-container {
   margin-block: 3rem;
 }
@@ -203,12 +219,14 @@ iconify-icon {
 
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  Table */
 .table-container {
+  margin-bottom: 4rem;
+}
+.table-wrapper {
   width: 100%;
   border-radius: 8px;
   border: var(--border);
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -362,4 +380,88 @@ iconify-icon {
 
 .action-btn--delete:hover {
   color: var(--danger-dark);
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Add animal modal */
+.modal {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.262);
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.modal__desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 300px;
+}
+
+.modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.6rem;
+  border: var(--border);
+  border-radius: 6px;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> footer */
+.footer {
+  text-align: center;
+  padding-block: 1rem;
+}
+
+footer p:first-child {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
 }
