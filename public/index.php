@@ -18,31 +18,32 @@
             <th>Name</th>
             <th>Species</th>
             <th>Gender</th>
-            <th>Age</th>
+            <th>Birth Date</th>
             <th>Description</th>
-            <th>Illnesses</th>
-            <th>Price</th>
-            <th>Status</th>
+            <th>Health Status</th>
+            <th>Adoption Fee</th>
+            <th>Adoption Status</th>
             <th>Picture</th>
             <th>Created At</th>
+            <th>Updated At</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($animals as $animal): ?>
             <tr>
-              <td><?php echo htmlspecialchars($animal['animalId'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalName'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['id'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['name'] ?? ''); ?></td>
               <td><?php echo htmlspecialchars($animal['species'] ?? ''); ?></td>
               <td><?php echo htmlspecialchars($animal['gender'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalAge'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['birth_date'] ?? ''); ?></td>
               <td><?php echo htmlspecialchars($animal['description'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['illnesses'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalPrice'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['status'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['health_status'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['adoption_fee'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['adoption_status'] ?? ''); ?></td>
               <td>
-                <?php if (!empty($animal['picture'])): ?>
+                <?php if (!empty($animal['picture_data'])): ?>
                   <img
-                    src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture']); ?>"
+                    src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture_data']); ?>"
                     alt="Animal picture"
                     width="80"
                   />
@@ -50,7 +51,8 @@
                   No image
                 <?php endif; ?>
               </td>
-              <td><?php echo htmlspecialchars($animal['createdAt'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['created_at'] ?? ''); ?></td>
+              <td><?php echo htmlspecialchars($animal['updated_at'] ?? ''); ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -63,8 +65,8 @@
 
     <h2>Add New Animal (POST /add)</h2>
     <form action="/add" method="post" enctype="multipart/form-data">
-      <label for="add-animalName">Animal Name:</label>
-      <input type="text" id="add-animalName" name="animalName" />
+      <label for="add-name">Animal Name:</label>
+      <input type="text" id="add-name" name="name" />
       <br />
 
       <label for="add-species">Species:</label>
@@ -72,27 +74,37 @@
       <br />
 
       <label for="add-gender">Gender:</label>
-      <input type="text" id="add-gender" name="gender" />
+      <select id="add-gender" name="gender">
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
+      </select>
       <br />
 
-      <label for="add-animalAge">Age:</label>
-      <input type="text" id="add-animalAge" name="animalAge" />
+      <label for="add-birth-date">Birth Date:</label>
+      <input type="date" id="add-birth-date" name="birth_date" />
       <br />
 
       <label for="add-description">Description:</label>
       <input type="text" id="add-description" name="description" />
       <br />
 
-      <label for="add-illnesses">Illnesses:</label>
-      <input type="text" id="add-illnesses" name="illnesses" />
+      <label for="add-health-status">Health Status:</label>
+      <select id="add-health-status" name="health_status">
+        <option value="HEALTHY">HEALTHY</option>
+        <option value="UNDER_TREATMENT">UNDER_TREATMENT</option>
+      </select>
       <br />
 
-      <label for="add-animalPrice">Price:</label>
-      <input type="text" id="add-animalPrice" name="animalPrice" />
+      <label for="add-adoption-fee">Adoption Fee:</label>
+      <input type="number" step="0.01" id="add-adoption-fee" name="adoption_fee" />
       <br />
 
-      <label for="add-status">Status:</label>
-      <input type="text" id="add-status" name="status" />
+      <label for="add-adoption-status">Adoption Status:</label>
+      <select id="add-adoption-status" name="adoption_status">
+        <option value="AVAILABLE">AVAILABLE</option>
+        <option value="RESERVED">RESERVED</option>
+        <option value="ADOPTED">ADOPTED</option>
+      </select>
       <br />
 
       <label for="add-picture">Picture:</label>
@@ -106,14 +118,14 @@
 
     <h2>Update Animal (POST /update)</h2>
     <form action="/update" method="post" enctype="multipart/form-data">
-      <label for="update-animalId">Animal ID (required):</label>
-      <input type="number" id="update-animalId" name="animalId" />
+      <label for="update-id">Animal ID (required):</label>
+      <input type="number" id="update-id" name="id" />
       <br />
 
       <p>You can fill only the fields you want to update.</p>
 
-      <label for="update-animalName">Animal Name:</label>
-      <input type="text" id="update-animalName" name="animalName" />
+      <label for="update-name">Animal Name:</label>
+      <input type="text" id="update-name" name="name" />
       <br />
 
       <label for="update-species">Species:</label>
@@ -121,27 +133,40 @@
       <br />
 
       <label for="update-gender">Gender:</label>
-      <input type="text" id="update-gender" name="gender" />
+      <select id="update-gender" name="gender">
+        <option value="">-- unchanged --</option>
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
+      </select>
       <br />
 
-      <label for="update-animalAge">Age:</label>
-      <input type="text" id="update-animalAge" name="animalAge" />
+      <label for="update-birth-date">Birth Date:</label>
+      <input type="date" id="update-birth-date" name="birth_date" />
       <br />
 
       <label for="update-description">Description:</label>
       <input type="text" id="update-description" name="description" />
       <br />
 
-      <label for="update-illnesses">Illnesses:</label>
-      <input type="text" id="update-illnesses" name="illnesses" />
+      <label for="update-health-status">Health Status:</label>
+      <select id="update-health-status" name="health_status">
+        <option value="">-- unchanged --</option>
+        <option value="HEALTHY">HEALTHY</option>
+        <option value="UNDER_TREATMENT">UNDER_TREATMENT</option>
+      </select>
       <br />
 
-      <label for="update-animalPrice">Price:</label>
-      <input type="text" id="update-animalPrice" name="animalPrice" />
+      <label for="update-adoption-fee">Adoption Fee:</label>
+      <input type="number" step="0.01" id="update-adoption-fee" name="adoption_fee" />
       <br />
 
-      <label for="update-status">Status:</label>
-      <input type="text" id="update-status" name="status" />
+      <label for="update-adoption-status">Adoption Status:</label>
+      <select id="update-adoption-status" name="adoption_status">
+        <option value="">-- unchanged --</option>
+        <option value="AVAILABLE">AVAILABLE</option>
+        <option value="RESERVED">RESERVED</option>
+        <option value="ADOPTED">ADOPTED</option>
+      </select>
       <br />
 
       <label for="update-picture">Picture:</label>
@@ -155,8 +180,8 @@
 
     <h2>Delete Animal (POST /delete)</h2>
     <form action="/delete" method="post">
-      <label for="delete-animalId">Animal ID:</label>
-      <input type="number" id="delete-animalId" name="animalId" />
+      <label for="delete-id">Animal ID:</label>
+      <input type="number" id="delete-id" name="id" />
       <br />
       <button type="submit">Delete Animal</button>
     </form>

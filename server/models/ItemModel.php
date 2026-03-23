@@ -3,27 +3,32 @@
 require_once __DIR__ . '/../controller/database.php';
 
 class ItemModel{
-    /**
-     * @var mysqli
-     * @var string
-     */
-    private $conn;
-    private $table = '`animal-information`';
+    private mysqli $databaseConnection;
+    private string $tableName = '`animal`';
 
     public function __construct(){
-        // Use the global mysqli connection defined in database.php
         global $conn;
-        $this->conn = $conn;
+        $this->databaseConnection = $conn;
     }
 
-    /**
-     * Fetch all animals.
-     *
-     * @return array|false
-     */
     public function all(){
-        $sql = "SELECT animalId, animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture, createdAt FROM {$this->table}";
-        $result = $this->conn->query($sql);
+        $selectAnimalsQuery = "
+            SELECT
+                id,
+                name,
+                species,
+                gender,
+                birth_date,
+                description,
+                health_status,
+                adoption_fee,
+                adoption_status,
+                picture_data,
+                created_at,
+                updated_at
+            FROM {$this->tableName}
+        ";
+        $result = $this->databaseConnection->query($selectAnimalsQuery);
 
         if ($result === false) {
             return false;
@@ -35,198 +40,207 @@ class ItemModel{
         return $animals;
     }
 
-    /**
-     * Find a single animal by ID.
-     *
-     * @param int $id
-     * @return array|null
-     */
     public function find($id){
-        $sql = "SELECT animalId, animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture, createdAt FROM {$this->table} WHERE animalId = ?";
-        $stmt = $this->conn->prepare($sql);
+        $findAnimalByIdQuery = "
+            SELECT
+                id,
+                name,
+                species,
+                gender,
+                birth_date,
+                description,
+                health_status,
+                adoption_fee,
+                adoption_status,
+                picture_data,
+                created_at,
+                updated_at
+            FROM {$this->tableName}
+            WHERE id = ?
+        ";
+        $findAnimalByIdStatement = $this->databaseConnection->prepare($findAnimalByIdQuery);
 
-        if (!$stmt) {
+        if (!$findAnimalByIdStatement) {
             return null;
         }
 
-        $id = (int) $id;
+        $animalId = (int) $id;
 
-        if (!$stmt->bind_param('i', $id)) {
-            $stmt->close();
+        if (!$findAnimalByIdStatement->bind_param('i', $animalId)) {
+            $findAnimalByIdStatement->close();
             return null;
         }
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$findAnimalByIdStatement->execute()) {
+            $findAnimalByIdStatement->close();
             return null;
         }
 
-        $result = $stmt->get_result();
+        $result = $findAnimalByIdStatement->get_result();
         if ($result === false) {
-            $stmt->close();
+            $findAnimalByIdStatement->close();
             return null;
         }
 
         $animal = $result->fetch_assoc() ?: null;
 
         $result->free();
-        $stmt->close();
+        $findAnimalByIdStatement->close();
 
         return $animal;
     }
 
-    /**
-     * Create a new animal.
-     *
-     * @param array $data
-     * @return array|false  Returns created animal on success, false on SQL error.
-     */
     public function create(array $data){
-        $sql = "INSERT INTO {$this->table} (animalName, species, gender, animalAge, description, illnesses, animalPrice, status, picture)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
+        $insertAnimalQuery = "
+            INSERT INTO {$this->tableName} (
+                name,
+                species,
+                gender,
+                birth_date,
+                description,
+                health_status,
+                adoption_fee,
+                adoption_status,
+                picture_data
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ";
+        $insertAnimalStatement = $this->databaseConnection->prepare($insertAnimalQuery);
 
-        if (!$stmt) {
+        if (!$insertAnimalStatement) {
             return false;
         }
 
-        $animalName  = $data['animalName'] ?? null;
-        $species     = $data['species'] ?? null;
-        $gender      = $data['gender'] ?? null;
-        $animalAge   = $data['animalAge'] ?? null;
-        $description = $data['description'] ?? null;
-        $illnesses   = $data['illnesses'] ?? null;
-        $animalPrice = $data['animalPrice'] ?? null;
-        $status      = $data['status'] ?? null;
-        $picture     = $data['picture'] ?? null;
+        $animalName = $data['name'] ?? null;
+        $animalSpecies = $data['species'] ?? null;
+        $animalGender = $data['gender'] ?? null;
+        $animalBirthDate = $data['birth_date'] ?? null;
+        $animalDescription = $data['description'] ?? null;
+        $animalHealthStatus = $data['health_status'] ?? 'HEALTHY';
+        $animalAdoptionFee = $data['adoption_fee'] ?? '0.00';
+        $animalAdoptionStatus = $data['adoption_status'] ?? 'AVAILABLE';
+        $animalPictureBinaryData = $data['picture_data'] ?? null;
 
-        // Treat all as strings; MySQL will coerce numeric fields appropriately.
-        if (!$stmt->bind_param(
+        if (!$insertAnimalStatement->bind_param(
             'sssssssss',
             $animalName,
-            $species,
-            $gender,
-            $animalAge,
-            $description,
-            $illnesses,
-            $animalPrice,
-            $status,
-            $picture
+            $animalSpecies,
+            $animalGender,
+            $animalBirthDate,
+            $animalDescription,
+            $animalHealthStatus,
+            $animalAdoptionFee,
+            $animalAdoptionStatus,
+            $animalPictureBinaryData
         )) {
-            $stmt->close();
+            $insertAnimalStatement->close();
             return false;
         }
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$insertAnimalStatement->execute()) {
+            $insertAnimalStatement->close();
             return false;
         }
 
-        $id = $stmt->insert_id ?: $this->conn->insert_id;
-        $stmt->close();
+        $createdAnimalId = $insertAnimalStatement->insert_id ?: $this->databaseConnection->insert_id;
+        $insertAnimalStatement->close();
 
-        return $this->find($id);
+        return $this->find($createdAnimalId);
     }
 
-    /**
-     * Update an existing animal.
-     *
-     * @param int   $id
-     * @param array $data
-     * @return array|null|false  Updated animal on success, null if not found, false on SQL error.
-     */
     public function update($id, array $data){
-        // Load existing record to support partial updates
-        $existing = $this->find($id);
-        if ($existing === null) {
+        $existingAnimalRecord = $this->find($id);
+        if ($existingAnimalRecord === null) {
             return null;
         }
 
-        $animalName  = array_key_exists('animalName', $data) ? $data['animalName'] : $existing['animalName'];
-        $species     = array_key_exists('species', $data) ? $data['species'] : $existing['species'];
-        $gender      = array_key_exists('gender', $data) ? $data['gender'] : $existing['gender'];
-        $animalAge   = array_key_exists('animalAge', $data) ? $data['animalAge'] : $existing['animalAge'];
-        $description = array_key_exists('description', $data) ? $data['description'] : $existing['description'];
-        $illnesses   = array_key_exists('illnesses', $data) ? $data['illnesses'] : $existing['illnesses'];
-        $animalPrice = array_key_exists('animalPrice', $data) ? $data['animalPrice'] : $existing['animalPrice'];
-        $status      = array_key_exists('status', $data) ? $data['status'] : $existing['status'];
-        $picture     = array_key_exists('picture', $data) ? $data['picture'] : $existing['picture'];
+        $animalName = array_key_exists('name', $data) ? $data['name'] : $existingAnimalRecord['name'];
+        $animalSpecies = array_key_exists('species', $data) ? $data['species'] : $existingAnimalRecord['species'];
+        $animalGender = array_key_exists('gender', $data) ? $data['gender'] : $existingAnimalRecord['gender'];
+        $animalBirthDate = array_key_exists('birth_date', $data) ? $data['birth_date'] : $existingAnimalRecord['birth_date'];
+        $animalDescription = array_key_exists('description', $data) ? $data['description'] : $existingAnimalRecord['description'];
+        $animalHealthStatus = array_key_exists('health_status', $data) ? $data['health_status'] : $existingAnimalRecord['health_status'];
+        $animalAdoptionFee = array_key_exists('adoption_fee', $data) ? $data['adoption_fee'] : $existingAnimalRecord['adoption_fee'];
+        $animalAdoptionStatus = array_key_exists('adoption_status', $data) ? $data['adoption_status'] : $existingAnimalRecord['adoption_status'];
+        $animalPictureBinaryData = array_key_exists('picture_data', $data) ? $data['picture_data'] : $existingAnimalRecord['picture_data'];
 
-        $sql = "UPDATE {$this->table}
-                SET animalName = ?, species = ?, gender = ?, animalAge = ?, description = ?, illnesses = ?, animalPrice = ?, status = ?, picture = ?
-                WHERE animalId = ?";
-        $stmt = $this->conn->prepare($sql);
+        $updateAnimalQuery = "
+            UPDATE {$this->tableName}
+            SET
+                name = ?,
+                species = ?,
+                gender = ?,
+                birth_date = ?,
+                description = ?,
+                health_status = ?,
+                adoption_fee = ?,
+                adoption_status = ?,
+                picture_data = ?
+            WHERE id = ?
+        ";
+        $updateAnimalStatement = $this->databaseConnection->prepare($updateAnimalQuery);
 
-        if (!$stmt) {
+        if (!$updateAnimalStatement) {
             return false;
         }
 
-        $id = (int) $id;
+        $animalId = (int) $id;
 
-        if (!$stmt->bind_param(
+        if (!$updateAnimalStatement->bind_param(
             'sssssssssi',
             $animalName,
-            $species,
-            $gender,
-            $animalAge,
-            $description,
-            $illnesses,
-            $animalPrice,
-            $status,
-            $picture,
-            $id
+            $animalSpecies,
+            $animalGender,
+            $animalBirthDate,
+            $animalDescription,
+            $animalHealthStatus,
+            $animalAdoptionFee,
+            $animalAdoptionStatus,
+            $animalPictureBinaryData,
+            $animalId
         )) {
-            $stmt->close();
+            $updateAnimalStatement->close();
             return false;
         }
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$updateAnimalStatement->execute()) {
+            $updateAnimalStatement->close();
             return false;
         }
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
+        $affectedRows = $updateAnimalStatement->affected_rows;
+        $updateAnimalStatement->close();
 
-        if ($affected === 0) {
-            // No rows updated (e.g. values are identical)
-            return $this->find($id);
+        if ($affectedRows === 0) {
+            return $this->find($animalId);
         }
 
-        return $this->find($id);
+        return $this->find($animalId);
     }
 
-    /**
-     * Delete an animal.
-     *
-     * @param int $id
-     * @return bool|null  true on delete, null if not found, false on SQL error.
-     */
     public function delete($id){
-        $sql = "DELETE FROM {$this->table} WHERE animalId = ?";
-        $stmt = $this->conn->prepare($sql);
+        $deleteAnimalQuery = "DELETE FROM {$this->tableName} WHERE id = ?";
+        $deleteAnimalStatement = $this->databaseConnection->prepare($deleteAnimalQuery);
 
-        if (!$stmt) {
+        if (!$deleteAnimalStatement) {
             return false;
         }
 
-        $id = (int) $id;
+        $animalId = (int) $id;
 
-        if (!$stmt->bind_param('i', $id)) {
-            $stmt->close();
+        if (!$deleteAnimalStatement->bind_param('i', $animalId)) {
+            $deleteAnimalStatement->close();
             return false;
         }
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$deleteAnimalStatement->execute()) {
+            $deleteAnimalStatement->close();
             return false;
         }
 
-        $affected = $stmt->affected_rows;
-        $stmt->close();
+        $affectedRows = $deleteAnimalStatement->affected_rows;
+        $deleteAnimalStatement->close();
 
-        if ($affected === 0) {
-            // No rows deleted (likely ID not found)
+        if ($affectedRows === 0) {
             return null;
         }
 

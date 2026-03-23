@@ -64,37 +64,50 @@ class ItemController{
         return null;
     }
 
+    private function encodeAnimalPictureForOutput(array $animalRecord): array{
+        if (!empty($animalRecord['picture_data'])) {
+            $animalRecord['picture_data'] = base64_encode($animalRecord['picture_data']);
+        }
+        return $animalRecord;
+    }
+
+    private function encodeAnimalCollectionForOutput(array $animalRecords): array{
+        $encodedAnimalRecords = [];
+        foreach ($animalRecords as $animalRecord) {
+            $encodedAnimalRecords[] = $this->encodeAnimalPictureForOutput($animalRecord);
+        }
+        return $encodedAnimalRecords;
+    }
+
     public function store(): void{
-        //header('Content-Type: application/json');
+        header('Content-Type: application/json');
+        $requestData = $this->getRequestData();
 
-        $data = $this->getRequestData();
-
-        // Map expected fields for an animal
-        $requiredFields = ['animalName', 'species', 'gender', 'animalAge', 'animalPrice', 'status'];
-        foreach ($requiredFields as $field) {
-            if (empty($data[$field])) {
+        $requiredFields = ['name', 'species', 'gender', 'birth_date'];
+        foreach ($requiredFields as $requiredFieldName) {
+            if (empty($requestData[$requiredFieldName])) {
                 http_response_code(400);
                 echo json_encode([
                     'status'  => 'error',
-                    'message' => $field . ' is required',
+                    'message' => $requiredFieldName . ' is required',
                 ]);
                 return;
             }
         }
 
-        // Optional fields
-        $data['description'] = $data['description'] ?? null;
-        $data['illnesses']   = $data['illnesses'] ?? null;
+        $requestData['description'] = $requestData['description'] ?? null;
+        $requestData['health_status'] = $requestData['health_status'] ?? 'HEALTHY';
+        $requestData['adoption_fee'] = $requestData['adoption_fee'] ?? '0.00';
+        $requestData['adoption_status'] = $requestData['adoption_status'] ?? 'AVAILABLE';
 
-        // Picture from upload (if any)
-        $picture = $this->extractPicture();
-        if ($picture !== null) {
-            $data['picture'] = $picture;
+        $uploadedPictureBinaryData = $this->extractPicture();
+        if ($uploadedPictureBinaryData !== null) {
+            $requestData['picture_data'] = $uploadedPictureBinaryData;
         }
 
-        $animal = $this->model->create($data);
+        $createdAnimalRecord = $this->model->create($requestData);
 
-        if ($animal === false) {
+        if ($createdAnimalRecord === false) {
             http_response_code(500);
             echo json_encode([
                 'status'  => 'error',
@@ -106,56 +119,50 @@ class ItemController{
         http_response_code(201);
         echo json_encode([
             'status' => 'success',
-            'data'   => $animal,
+            'data'   => $this->encodeAnimalPictureForOutput($createdAnimalRecord),
         ]);
-
-        $this->index();
     }
 
     public function update(): void{
-        //header('Content-Type: application/json');
+        header('Content-Type: application/json');
+        $requestData = $this->getRequestData();
 
-        $data = $this->getRequestData();
-
-        // ID is required
-        $id = $data['animalId'] ?? ($_GET['animalId'] ?? null);
-        if (empty($id)) {
+        $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
+        if (empty($animalId)) {
             http_response_code(400);
             echo json_encode([
                 'status'  => 'error',
-                'message' => 'animalId is required',
+                'message' => 'id is required',
             ]);
             return;
         }
 
-        // At least one updatable field must be present
         $updatableFields = [
-            'animalName',
+            'name',
             'species',
             'gender',
-            'animalAge',
+            'birth_date',
             'description',
-            'illnesses',
-            'animalPrice',
-            'status',
+            'health_status',
+            'adoption_fee',
+            'adoption_status',
         ];
 
-        $hasUpdateField = false;
-        foreach ($updatableFields as $field) {
-            if (array_key_exists($field, $data) && $data[$field] !== '') {
-                $hasUpdateField = true;
+        $requestIncludesUpdatableFields = false;
+        foreach ($updatableFields as $updatableFieldName) {
+            if (array_key_exists($updatableFieldName, $requestData) && $requestData[$updatableFieldName] !== '') {
+                $requestIncludesUpdatableFields = true;
                 break;
             }
         }
 
-        // Picture from upload (if any) also counts as an update field
-        $picture = $this->extractPicture();
-        if ($picture !== null) {
-            $data['picture'] = $picture;
-            $hasUpdateField  = true;
+        $uploadedPictureBinaryData = $this->extractPicture();
+        if ($uploadedPictureBinaryData !== null) {
+            $requestData['picture_data'] = $uploadedPictureBinaryData;
+            $requestIncludesUpdatableFields = true;
         }
 
-        if (!$hasUpdateField) {
+        if (!$requestIncludesUpdatableFields) {
             http_response_code(400);
             echo json_encode([
                 'status'  => 'error',
@@ -164,9 +171,9 @@ class ItemController{
             return;
         }
 
-        $updated = $this->model->update($id, $data);
+        $updatedAnimalRecord = $this->model->update($animalId, $requestData);
 
-        if ($updated === false) {
+        if ($updatedAnimalRecord === false) {
             http_response_code(500);
             echo json_encode([
                 'status'  => 'error',
@@ -175,7 +182,7 @@ class ItemController{
             return;
         }
 
-        if ($updated === null) {
+        if ($updatedAnimalRecord === null) {
             http_response_code(400);
             echo json_encode([
                 'status'  => 'error',
@@ -187,28 +194,25 @@ class ItemController{
         http_response_code(200);
         echo json_encode([
             'status' => 'success',
-            'data'   => $updated,
+            'data'   => $this->encodeAnimalPictureForOutput($updatedAnimalRecord),
         ]);
-
-        $this->index();
     }
 
     public function destroy(): void{
-        //header('Content-Type: application/json');
+        header('Content-Type: application/json');
+        $requestData = $this->getRequestData();
+        $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
 
-        $data = $this->getRequestData();
-        $id   = $data['animalId'] ?? ($_GET['animalId'] ?? null);
-
-        if (empty($id)) {
+        if (empty($animalId)) {
             http_response_code(400);
             echo json_encode([
                 'status'  => 'error',
-                'message' => 'animalId is required',
+                'message' => 'id is required',
             ]);
             return;
         }
 
-        $deleted = $this->model->delete($id);
+        $deleted = $this->model->delete($animalId);
 
         if ($deleted === false) {
             http_response_code(500);
@@ -233,7 +237,5 @@ class ItemController{
             'status'  => 'success',
             'message' => 'Animal deleted successfully',
         ]);
-
-        $this->index();
     }
 }
