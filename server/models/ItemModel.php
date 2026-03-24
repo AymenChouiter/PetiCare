@@ -4,15 +4,15 @@ require_once __DIR__ . '/../controller/database.php';
 
 class ItemModel{
     private mysqli $databaseConnection;
-    private string $tableName = '`animal`';
+    private string $animalTableName = '`animal`';
 
     public function __construct(){
         global $conn;
         $this->databaseConnection = $conn;
     }
 
-    public function all(){
-        $selectAnimalsQuery = "
+    public function fetchAllAnimalRecords(){
+        $selectAllAnimalRecordsQuery = "
             SELECT
                 id,
                 name,
@@ -26,21 +26,21 @@ class ItemModel{
                 picture_data,
                 created_at,
                 updated_at
-            FROM {$this->tableName}
+            FROM {$this->animalTableName}
         ";
-        $result = $this->databaseConnection->query($selectAnimalsQuery);
+        $allAnimalRecordsQueryResult = $this->databaseConnection->query($selectAllAnimalRecordsQuery);
 
-        if ($result === false) {
+        if ($allAnimalRecordsQueryResult === false) {
             return false;
         }
 
-        $animals = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
+        $allAnimalRecords = $allAnimalRecordsQueryResult->fetch_all(MYSQLI_ASSOC);
+        $allAnimalRecordsQueryResult->free();
 
-        return $animals;
+        return $allAnimalRecords;
     }
 
-    public function find($id){
+    public function fetchAnimalRecordById($id){
         $findAnimalByIdQuery = "
             SELECT
                 id,
@@ -55,7 +55,7 @@ class ItemModel{
                 picture_data,
                 created_at,
                 updated_at
-            FROM {$this->tableName}
+            FROM {$this->animalTableName}
             WHERE id = ?
         ";
         $findAnimalByIdStatement = $this->databaseConnection->prepare($findAnimalByIdQuery);
@@ -82,17 +82,17 @@ class ItemModel{
             return null;
         }
 
-        $animal = $result->fetch_assoc() ?: null;
+        $animalRecord = $result->fetch_assoc() ?: null;
 
         $result->free();
         $findAnimalByIdStatement->close();
 
-        return $animal;
+        return $animalRecord;
     }
 
-    public function create(array $data){
+    public function createAnimalRecord(array $data){
         $insertAnimalQuery = "
-            INSERT INTO {$this->tableName} (
+            INSERT INTO {$this->animalTableName} (
                 name,
                 species,
                 gender,
@@ -144,11 +144,11 @@ class ItemModel{
         $createdAnimalId = $insertAnimalStatement->insert_id ?: $this->databaseConnection->insert_id;
         $insertAnimalStatement->close();
 
-        return $this->find($createdAnimalId);
+        return $this->fetchAnimalRecordById($createdAnimalId);
     }
 
-    public function update($id, array $data){
-        $existingAnimalRecord = $this->find($id);
+    public function updateAnimalRecordById($id, array $data){
+        $existingAnimalRecord = $this->fetchAnimalRecordById($id);
         if ($existingAnimalRecord === null) {
             return null;
         }
@@ -164,7 +164,7 @@ class ItemModel{
         $animalPictureBinaryData = array_key_exists('picture_data', $data) ? $data['picture_data'] : $existingAnimalRecord['picture_data'];
 
         $updateAnimalQuery = "
-            UPDATE {$this->tableName}
+            UPDATE {$this->animalTableName}
             SET
                 name = ?,
                 species = ?,
@@ -211,14 +211,14 @@ class ItemModel{
         $updateAnimalStatement->close();
 
         if ($affectedRows === 0) {
-            return $this->find($animalId);
+            return $this->fetchAnimalRecordById($animalId);
         }
 
-        return $this->find($animalId);
+        return $this->fetchAnimalRecordById($animalId);
     }
 
-    public function delete($id){
-        $deleteAnimalQuery = "DELETE FROM {$this->tableName} WHERE id = ?";
+    public function deleteAnimalRecordById($id){
+        $deleteAnimalQuery = "DELETE FROM {$this->animalTableName} WHERE id = ?";
         $deleteAnimalStatement = $this->databaseConnection->prepare($deleteAnimalQuery);
 
         if (!$deleteAnimalStatement) {

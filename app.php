@@ -1,45 +1,42 @@
 <?php
 
-$request = $_SERVER['REQUEST_URI'];
-$method  = $_SERVER['REQUEST_METHOD'];
+$requestUri = $_SERVER['REQUEST_URI'];
+$requestMethod = $_SERVER['REQUEST_METHOD'];
 
-$path = parse_url($request, PHP_URL_PATH);
+$requestPath = parse_url($requestUri, PHP_URL_PATH);
 
 require_once __DIR__ . '/server/controller/ItemController.php';
 
-// Normalize method override if needed (e.g., using _method in POST)
-if ($method === 'POST' && isset($_POST['_method'])) {
-    $override = strtoupper($_POST['_method']);
-    if (in_array($override, ['PUT', 'DELETE'], true)) {
-        $method = $override;
+if ($requestMethod === 'POST' && isset($_POST['_method'])) {
+    $overriddenHttpMethod = strtoupper($_POST['_method']);
+    if (in_array($overriddenHttpMethod, ['PUT', 'DELETE'], true)) {
+        $requestMethod = $overriddenHttpMethod;
     }
 }
 
-// API routes
-if ($method === 'POST' && $path === '/add') {
-    $controller = new ItemController();
-    $controller->store();
+if ($requestMethod === 'POST' && $requestPath === '/add') {
+    $itemController = new ItemController();
+    $itemController->createAnimalRecord();
     exit;
 }
 
-if (($method === 'POST' && $path === '/update') || ($method === 'PUT' && $path === '/edit')) {
-    $controller = new ItemController();
-    $controller->update();
+if (($requestMethod === 'POST' && $requestPath === '/update') || ($requestMethod === 'PUT' && $requestPath === '/edit')) {
+    $itemController = new ItemController();
+    $itemController->updateAnimalRecord();
     exit;
 }
 
-if (($method === 'POST' && $path === '/delete') || ($method === 'DELETE' && $path === '/remove')) {
-    $controller = new ItemController();
-    $controller->destroy();
+if (($requestMethod === 'POST' && $requestPath === '/delete') || ($requestMethod === 'DELETE' && $requestPath === '/remove')) {
+    $itemController = new ItemController();
+    $itemController->deleteAnimalRecord();
     exit;
 }
 
-// Existing home route - show animals and admin panel
-$path = rtrim($path, '/') ?: '/';
-$staticFile = __DIR__ . '/public' . $path;
+$normalizedRequestPath = rtrim($requestPath, '/') ?: '/';
+$resolvedStaticAssetPath = __DIR__ . '/public' . $normalizedRequestPath;
 
-if (file_exists($staticFile) && is_file($staticFile)) {
-    $mime = [
+if (file_exists($resolvedStaticAssetPath) && is_file($resolvedStaticAssetPath)) {
+    $mimeTypeByFileExtension = [
         'css'  => 'text/css',
         'js'   => 'application/javascript',
         'png'  => 'image/png',
@@ -51,15 +48,15 @@ if (file_exists($staticFile) && is_file($staticFile)) {
         'woff2'=> 'font/woff2',
     ];
 
-    $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
-    header('Content-Type: ' . ($mime[$ext] ?? 'application/octet-stream'));
-    readfile($staticFile);
+    $requestedFileExtension = strtolower(pathinfo($resolvedStaticAssetPath, PATHINFO_EXTENSION));
+    header('Content-Type: ' . ($mimeTypeByFileExtension[$requestedFileExtension] ?? 'application/octet-stream'));
+    readfile($resolvedStaticAssetPath);
     exit;
 }
 
-if ($method === 'GET' && ($path === '/' || $path === '/index.php')) {
-    $controller = new ItemController();
-    $controller->index();
+if ($requestMethod === 'GET' && ($normalizedRequestPath === '/' || $normalizedRequestPath === '/index.php')) {
+    $itemController = new ItemController();
+    $itemController->renderAnimalManagementPage();
 } else {
     http_response_code(404);
     header('Content-Type: application/json');

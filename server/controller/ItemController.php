@@ -3,85 +3,66 @@
 require_once __DIR__ . '/../models/ItemModel.php';
 
 class ItemController{
-    private ItemModel $model;
+    private ItemModel $animalDataRepository;
+
     public function __construct(){
-        $this->model = new ItemModel();
+        $this->animalDataRepository = new ItemModel();
     }
 
-    /**
-     * Render HTML page listing all animals and providing forms.
-     */
-    public function index(): void{
-        $animals = $this->model->all();
+    public function renderAnimalManagementPage(): void{
+        $animalRecords = $this->animalDataRepository->fetchAllAnimalRecords();
 
-        if ($animals === false) {
+        if ($animalRecords === false) {
             http_response_code(500);
             header('Content-Type: text/plain');
             echo 'Failed to load animals from database.';
             return;
         }
 
-        // Render the main admin page (HTML)
+        $animals = $animalRecords;
         require __DIR__ . '/../../public/index.php';
     }
 
-    /**
-     * Get request data.
-     * - If Content-Type is application/json, read JSON body.
-     * - Otherwise use $_POST (form data).
-     */
-    private function getRequestData(): array{
-        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    private function extractIncomingRequestData(): array{
+        $incomingRequestContentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
-        if (stripos($contentType, 'application/json') !== false) {
-            $raw = file_get_contents('php://input');
-            if (!empty($raw)) {
-                $data = json_decode($raw, true);
-                if (is_array($data)) {
-                    return $data;
+        if (stripos($incomingRequestContentType, 'application/json') !== false) {
+            $rawRequestBodyContent = file_get_contents('php://input');
+            if (!empty($rawRequestBodyContent)) {
+                $decodedJsonRequestBody = json_decode($rawRequestBodyContent, true);
+                if (is_array($decodedJsonRequestBody)) {
+                    return $decodedJsonRequestBody;
                 }
             }
             return [];
         }
 
-        // For form submissions (including multipart/form-data)
         return $_POST ?? [];
     }
 
-    /**
-     * Handle file upload for picture if present.
-     */
-    private function extractPicture(): ?string{
+    private function extractUploadedAnimalPictureBinaryData(): ?string{
         if (!isset($_FILES['picture']) || !is_array($_FILES['picture'])) {
             return null;
         }
 
         if (!empty($_FILES['picture']['tmp_name']) && is_uploaded_file($_FILES['picture']['tmp_name'])) {
-            $content = file_get_contents($_FILES['picture']['tmp_name']);
-            return $content === false ? null : $content;
+            $uploadedPictureBinaryContent = file_get_contents($_FILES['picture']['tmp_name']);
+            return $uploadedPictureBinaryContent === false ? null : $uploadedPictureBinaryContent;
         }
 
         return null;
     }
 
-    private function encodeAnimalPictureForOutput(array $animalRecord): array{
+    private function transformAnimalRecordPictureDataToBase64(array $animalRecord): array{
         if (!empty($animalRecord['picture_data'])) {
             $animalRecord['picture_data'] = base64_encode($animalRecord['picture_data']);
         }
         return $animalRecord;
     }
 
-    private function encodeAnimalCollectionForOutput(array $animalRecords): array{
-        $encodedAnimalRecords = [];
-        foreach ($animalRecords as $animalRecord) {
-            $encodedAnimalRecords[] = $this->encodeAnimalPictureForOutput($animalRecord);
-        }
-        return $encodedAnimalRecords;
-    }
-
-    public function store(): void{
+    public function createAnimalRecord(): void{
         header('Content-Type: application/json');
-        $requestData = $this->getRequestData();
+        $requestData = $this->extractIncomingRequestData();
 
         $requiredFields = ['name', 'species', 'gender', 'birth_date'];
         foreach ($requiredFields as $requiredFieldName) {
@@ -100,12 +81,12 @@ class ItemController{
         $requestData['adoption_fee'] = $requestData['adoption_fee'] ?? '0.00';
         $requestData['adoption_status'] = $requestData['adoption_status'] ?? 'AVAILABLE';
 
-        $uploadedPictureBinaryData = $this->extractPicture();
+        $uploadedPictureBinaryData = $this->extractUploadedAnimalPictureBinaryData();
         if ($uploadedPictureBinaryData !== null) {
             $requestData['picture_data'] = $uploadedPictureBinaryData;
         }
 
-        $createdAnimalRecord = $this->model->create($requestData);
+        $createdAnimalRecord = $this->animalDataRepository->createAnimalRecord($requestData);
 
         if ($createdAnimalRecord === false) {
             http_response_code(500);
@@ -119,13 +100,13 @@ class ItemController{
         http_response_code(201);
         echo json_encode([
             'status' => 'success',
-            'data'   => $this->encodeAnimalPictureForOutput($createdAnimalRecord),
+            'data'   => $this->transformAnimalRecordPictureDataToBase64($createdAnimalRecord),
         ]);
     }
 
-    public function update(): void{
+    public function updateAnimalRecord(): void{
         header('Content-Type: application/json');
-        $requestData = $this->getRequestData();
+        $requestData = $this->extractIncomingRequestData();
 
         $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
         if (empty($animalId)) {
@@ -156,7 +137,7 @@ class ItemController{
             }
         }
 
-        $uploadedPictureBinaryData = $this->extractPicture();
+        $uploadedPictureBinaryData = $this->extractUploadedAnimalPictureBinaryData();
         if ($uploadedPictureBinaryData !== null) {
             $requestData['picture_data'] = $uploadedPictureBinaryData;
             $requestIncludesUpdatableFields = true;
@@ -171,7 +152,7 @@ class ItemController{
             return;
         }
 
-        $updatedAnimalRecord = $this->model->update($animalId, $requestData);
+        $updatedAnimalRecord = $this->animalDataRepository->updateAnimalRecordById($animalId, $requestData);
 
         if ($updatedAnimalRecord === false) {
             http_response_code(500);
@@ -194,13 +175,13 @@ class ItemController{
         http_response_code(200);
         echo json_encode([
             'status' => 'success',
-            'data'   => $this->encodeAnimalPictureForOutput($updatedAnimalRecord),
+            'data'   => $this->transformAnimalRecordPictureDataToBase64($updatedAnimalRecord),
         ]);
     }
 
-    public function destroy(): void{
+    public function deleteAnimalRecord(): void{
         header('Content-Type: application/json');
-        $requestData = $this->getRequestData();
+        $requestData = $this->extractIncomingRequestData();
         $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
 
         if (empty($animalId)) {
@@ -212,7 +193,7 @@ class ItemController{
             return;
         }
 
-        $deleted = $this->model->delete($animalId);
+        $deleted = $this->animalDataRepository->deleteAnimalRecordById($animalId);
 
         if ($deleted === false) {
             http_response_code(500);
