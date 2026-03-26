@@ -1,169 +1,223 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Animal Care Center - Admin</title>
-  </head>
-  <body>
-    <h1>Animal Care Center - Admin Panel</h1>
 
-    <h2>Animals in Database</h2>
-    <?php if (isset($animals) && is_array($animals) && count($animals) > 0): ?>
-      <table border="1" cellpadding="4" cellspacing="0">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Species</th>
-            <th>Gender</th>
-            <th>Age</th>
-            <th>Description</th>
-            <th>Illnesses</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Picture</th>
-            <th>Created At</th>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetiCare</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet" />
+  <!-- Icons -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="header__brand">
+        <img src="/assets/logo.png" alt="Logo" class="header__logo" />
+        <h1 class="header__title">Admin Dashboard</h1>
+      </div>
+    </div>
+  </header>
+  <div class="page-head container">
+    <div class="page-head__meta">
+      <h2 class="page-head__title">Animals</h2>
+      <p class="page-head__desc">
+        Manage all animals in the PetiCare adoption center
+      </p>
+    </div>
+    <button class="btn btn--primary" type="button" data-btn-open="add">
+      <iconify-icon icon="material-symbols:add-rounded"></iconify-icon>
+      <span>Add Animal</span>
+    </button>
+  </div>
+  <div class="toolbar-container container">
+    <div class="toolbar">
+      <div class="toolbar__search">
+        <iconify-icon icon="mdi:magnify" aria-hidden="true" class="toolbar__search-icon"></iconify-icon>
+
+        <input type="text" name="search" placeholder="Search animals by name..." class="toolbar__search-input"
+          autocomplete="off" />
+      </div>
+      <select name="species" class="toolbar__select">
+        <option value="">All Species</option>
+        <option value="dog">Dog</option>
+        <option value="cat">Cat</option>
+        <option value="bird">Bird</option>
+        <option value="rabbit">Rabbit</option>
+        <option value="other">Other</option>
+      </select>
+      <select name="adoption_status" class="toolbar__select">
+        <option value="">All Adoption Status</option>
+        <option value="AVAILABLE">Available</option>
+        <option value="RESERVED">Reserved</option>
+        <option value="ADOPTED">Adopted</option>
+      </select>
+    </div>
+  </div>
+  <div class="container table-container">
+    <div class="table-wrapper">
+      <table class="table">
+        <thead class="table__head">
+          <tr class="table__row">
+            <th class="table__th">Animal</th>
+            <th class="table__th">Species</th>
+            <th class="table__th">Gender</th>
+            <th class="table__th">Age</th>
+            <th class="table__th">Health</th>
+            <th class="table__th">Fee</th>
+            <th class="table__th">Status</th>
+            <th class="table__th">Timeline</th>
+            <th class="table__th table__th--center">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="table__body">
           <?php foreach ($animals as $animal): ?>
-            <tr>
-              <td><?php echo htmlspecialchars($animal['animalId'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalName'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['species'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['gender'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalAge'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['description'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['illnesses'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['animalPrice'] ?? ''); ?></td>
-              <td><?php echo htmlspecialchars($animal['status'] ?? ''); ?></td>
-              <td>
-                <?php if (!empty($animal['picture'])): ?>
-                  <img
-                    src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture']); ?>"
-                    alt="Animal picture"
-                    width="80"
-                  />
-                <?php else: ?>
-                  No image
-                <?php endif; ?>
+            <tr class="table__row">
+              <td class="table__td">
+                <div class="table__animal-info">
+                  <div class="table__avatar">
+                    <?php if ($animal['picture_blob']): ?>
+                      <img src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture_blob']); ?>"
+                        alt="Animal picture" />
+                    <?php else: ?>
+                      <iconify-icon icon="lucide:paw-print"></iconify-icon>
+                    <?php endif; ?>
+                  </div>
+                  <div class="table__animal-meta">
+                    <span class="table__animal-name"><?php echo $animal['name'] ?></span>
+                    <span class="table__animal-desc"><?php echo $animal['description'] ?></span>
+                  </div>
+                </div>
               </td>
-              <td><?php echo htmlspecialchars($animal['createdAt'] ?? ''); ?></td>
+              <td class="table__td"><?php echo $animal['species'] ?></td>
+              <td class="table__td"><?php echo $animal['gender'] ?></td>
+              <td class="table__td"><?php echo $animal['age'] ?></td>
+              <td class="table__td">
+                <span class="badge badge--health-<?php echo $animal['health_class'] ?>">
+                  <?php echo $animal['health_status'] ?>
+                </span>
+              </td>
+              <td class="table__td table__td--bold">
+                <?php echo $animal['adoption_fee'] ?>
+              </td>
+              <td class="table__td">
+                <span class="badge badge--status-<?php echo strtolower($animal['adoption_status']) ?>">
+                  <?php echo $animal['adoption_status'] ?>
+                </span>
+              </td>
+              <td class="table__td">
+                <div class="table__timeline">
+                  <span>Cr: <?php echo $animal['created_at'] ?> </span>
+                  <span>Up: <?php echo $animal['updated_at'] ?> </span>
+                </div>
+              </td>
+              <td class="table__td">
+                <div class="table__actions">
+                  <button class="action-btn action-btn--edit" aria-label="Edit">
+                    <iconify-icon icon="material-symbols:edit-outline-rounded"></iconify-icon>
+                  </button>
+                  <button class="action-btn action-btn--delete" aria-label="Delete">
+                    <iconify-icon icon="material-symbols:delete-outline"></iconify-icon>
+                  </button>
+                </div>
+              </td>
             </tr>
           <?php endforeach; ?>
         </tbody>
       </table>
-    <?php else: ?>
-      <p>No animals found.</p>
-    <?php endif; ?>
+    </div>
+  </div>
+  <dialog class="modal" data-modal="add">
+    <div class="modal__header">
+      <div class="modal_info">
+        <h2 class="modal__title">Add New Animal</h2>
+        <p class="modal__desc">
+          Fill in the details to add a new animal to the adoption center
+        </p>
+      </div>
+      <button type="button" class="modal__close" aria-label="Close modal" data-btn-close="add">
+        <iconify-icon icon="material-symbols:close-rounded" aria-hidden="true"></iconify-icon>
+      </button>
+    </div>
 
-    <hr />
+    <form method="POST" action="/add" enctype="multipart/form-data" class="modal__form">
 
-    <h2>Add New Animal (POST /add)</h2>
-    <form action="/add" method="post" enctype="multipart/form-data">
-      <label for="add-animalName">Animal Name:</label>
-      <input type="text" id="add-animalName" name="animalName" />
-      <br />
+      <div class="form-group">
+        <label for="animal-picture">Profile Picture</label>
+        <input type="file" name="picture" id="animal-picture" accept="image/*" />
+      </div>
 
-      <label for="add-species">Species:</label>
-      <input type="text" id="add-species" name="species" />
-      <br />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="animal-name">Name</label>
+          <input type="text" name="name" id="animal-name" placeholder="e.g. Luna" required />
+        </div>
+        <div class="form-group">
+          <label for="animal-species">Species</label>
+          <input type="text" name="species" id="animal-species" placeholder="e.g. Dog" required />
+        </div>
+      </div>
 
-      <label for="add-gender">Gender:</label>
-      <input type="text" id="add-gender" name="gender" />
-      <br />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="animal-gender">Gender</label>
+          <select name="gender" id="animal-gender" required>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="animal-birth">Birth Date</label>
+          <input type="date" name="birth_date" id="animal-birth" required />
+        </div>
+      </div>
 
-      <label for="add-animalAge">Age:</label>
-      <input type="text" id="add-animalAge" name="animalAge" />
-      <br />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="animal-health">Health Status</label>
+          <select name="health_status" id="animal-health" required>
+            <option value="HEALTHY">Healthy</option>
+            <option value="UNDER_TREATMENT">Under Treatment</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="animal-adoption">Adoption Status</label>
+          <select name="adoption_status" id="animal-adoption">
+            <option value="AVAILABLE">Available</option>
+            <option value="RESERVED">Reserved</option>
+            <option value="ADOPTED">Adopted</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="add-description">Description:</label>
-      <input type="text" id="add-description" name="description" />
-      <br />
+      <div class="form-group">
+        <label for="animal-fee">Adoption Fee (DA)</label>
+        <input type="number" step="100" name="adoption_fee" id="animal-fee" placeholder="0" required />
+      </div>
 
-      <label for="add-illnesses">Illnesses:</label>
-      <input type="text" id="add-illnesses" name="illnesses" />
-      <br />
+      <div class="form-group">
+        <label for="animal-desc">Description</label>
+        <textarea name="description" id="animal-desc" rows="3" placeholder="Describe this animal..."></textarea>
+      </div>
 
-      <label for="add-animalPrice">Price:</label>
-      <input type="text" id="add-animalPrice" name="animalPrice" />
-      <br />
-
-      <label for="add-status">Status:</label>
-      <input type="text" id="add-status" name="status" />
-      <br />
-
-      <label for="add-picture">Picture:</label>
-      <input type="file" id="add-picture" name="picture" />
-      <br />
-
-      <button type="submit">Add Animal</button>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--secondary" data-btn-close="add">Cancel</button>
+        <button type="submit" class="btn btn--primary">Add Animal</button>
+      </div>
     </form>
+  </dialog>
+  <footer class="footer">
+    <p>Made with &#9825; by Farouk & Aymen</p>
+    <p>&copy;2025/2026 WEB course project</p>
+  </footer>
+  <script src="js/logic.js" defer></script>
+</body>
 
-    <hr />
-
-    <h2>Update Animal (POST /update)</h2>
-    <form action="/update" method="post" enctype="multipart/form-data">
-      <label for="update-animalId">Animal ID (required):</label>
-      <input type="number" id="update-animalId" name="animalId" />
-      <br />
-
-      <p>You can fill only the fields you want to update.</p>
-
-      <label for="update-animalName">Animal Name:</label>
-      <input type="text" id="update-animalName" name="animalName" />
-      <br />
-
-      <label for="update-species">Species:</label>
-      <input type="text" id="update-species" name="species" />
-      <br />
-
-      <label for="update-gender">Gender:</label>
-      <input type="text" id="update-gender" name="gender" />
-      <br />
-
-      <label for="update-animalAge">Age:</label>
-      <input type="text" id="update-animalAge" name="animalAge" />
-      <br />
-
-      <label for="update-description">Description:</label>
-      <input type="text" id="update-description" name="description" />
-      <br />
-
-      <label for="update-illnesses">Illnesses:</label>
-      <input type="text" id="update-illnesses" name="illnesses" />
-      <br />
-
-      <label for="update-animalPrice">Price:</label>
-      <input type="text" id="update-animalPrice" name="animalPrice" />
-      <br />
-
-      <label for="update-status">Status:</label>
-      <input type="text" id="update-status" name="status" />
-      <br />
-
-      <label for="update-picture">Picture:</label>
-      <input type="file" id="update-picture" name="picture" />
-      <br />
-
-      <button type="submit">Update Animal</button>
-    </form>
-
-    <hr />
-
-    <h2>Delete Animal (POST /delete)</h2>
-    <form action="/delete" method="post">
-      <label for="delete-animalId">Animal ID:</label>
-      <input type="number" id="delete-animalId" name="animalId" />
-      <br />
-      <button type="submit">Delete Animal</button>
-    </form>
-
-    <hr />
-
-    <p>
-      After submitting a form, the JSON response from the API will be shown by the browser.
-    </p>
-  </body>
 </html>
