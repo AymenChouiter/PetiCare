@@ -83,8 +83,8 @@
               <td class="table__td">
                 <div class="table__animal-info">
                   <div class="table__avatar">
-                    <?php if ($animal['picture_blob']): ?>
-                      <img src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture_blob']); ?>"
+                    <?php if ($animal['picture_data']): ?>
+                      <img src="data:image/jpeg;base64,<?php echo base64_encode($animal['picture_data']); ?>"
                         alt="Animal picture" />
                     <?php else: ?>
                       <iconify-icon icon="lucide:paw-print"></iconify-icon>
