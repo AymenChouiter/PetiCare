@@ -69,12 +69,6 @@ class ItemController{
         return null;
     }
 
-    private function transformAnimalRecordPictureDataToBase64(array $animalRecord): array{
-        if (!empty($animalRecord['picture_data'])) {
-            $animalRecord['picture_data'] = base64_encode($animalRecord['picture_data']);
-        }
-        return $animalRecord;
-    }
 
     public function createAnimalRecord(): void{
         header('Content-Type: application/json');
@@ -116,7 +110,6 @@ class ItemController{
         http_response_code(201);
         echo json_encode([
             'status' => 'success',
-            'data'   => $this->transformAnimalRecordPictureDataToBase64($createdAnimalRecord),
         ]);
     }
 
@@ -191,7 +184,6 @@ class ItemController{
         http_response_code(200);
         echo json_encode([
             'status' => 'success',
-            'data'   => $this->transformAnimalRecordPictureDataToBase64($updatedAnimalRecord),
         ]);
     }
 

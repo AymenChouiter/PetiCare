@@ -40,56 +40,6 @@ class ItemModel{
         return $allAnimalRecords;
     }
 
-    public function fetchAnimalRecordById($id){
-        $findAnimalByIdQuery = "
-            SELECT
-                id,
-                name,
-                species,
-                gender,
-                birth_date,
-                description,
-                health_status,
-                adoption_fee,
-                adoption_status,
-                picture_data,
-                created_at,
-                updated_at
-            FROM {$this->animalTableName}
-            WHERE id = ?
-        ";
-        $findAnimalByIdStatement = $this->databaseConnection->prepare($findAnimalByIdQuery);
-
-        if (!$findAnimalByIdStatement) {
-            return null;
-        }
-
-        $animalId = (int) $id;
-
-        if (!$findAnimalByIdStatement->bind_param('i', $animalId)) {
-            $findAnimalByIdStatement->close();
-            return null;
-        }
-
-        if (!$findAnimalByIdStatement->execute()) {
-            $findAnimalByIdStatement->close();
-            return null;
-        }
-
-        $result = $findAnimalByIdStatement->get_result();
-        if ($result === false) {
-            $findAnimalByIdStatement->close();
-            return null;
-        }
-
-        $animalRecord = $result->fetch_assoc() ?: null;
-
-        $result->free();
-        $findAnimalByIdStatement->close();
-
-        return $animalRecord;
-    }
-
     public function createAnimalRecord(array $data){
         $insertAnimalQuery = "
             INSERT INTO {$this->animalTableName} (
@@ -144,24 +94,19 @@ class ItemModel{
         $createdAnimalId = $insertAnimalStatement->insert_id ?: $this->databaseConnection->insert_id;
         $insertAnimalStatement->close();
 
-        return $this->fetchAnimalRecordById($createdAnimalId);
+        return true;
     }
 
     public function updateAnimalRecordById($id, array $data){
-        $existingAnimalRecord = $this->fetchAnimalRecordById($id);
-        if ($existingAnimalRecord === null) {
-            return null;
-        }
-
-        $animalName = array_key_exists('name', $data) ? $data['name'] : $existingAnimalRecord['name'];
-        $animalSpecies = array_key_exists('species', $data) ? $data['species'] : $existingAnimalRecord['species'];
-        $animalGender = array_key_exists('gender', $data) ? $data['gender'] : $existingAnimalRecord['gender'];
-        $animalBirthDate = array_key_exists('birth_date', $data) ? $data['birth_date'] : $existingAnimalRecord['birth_date'];
-        $animalDescription = array_key_exists('description', $data) ? $data['description'] : $existingAnimalRecord['description'];
-        $animalHealthStatus = array_key_exists('health_status', $data) ? $data['health_status'] : $existingAnimalRecord['health_status'];
-        $animalAdoptionFee = array_key_exists('adoption_fee', $data) ? $data['adoption_fee'] : $existingAnimalRecord['adoption_fee'];
-        $animalAdoptionStatus = array_key_exists('adoption_status', $data) ? $data['adoption_status'] : $existingAnimalRecord['adoption_status'];
-        $animalPictureBinaryData = array_key_exists('picture_data', $data) ? $data['picture_data'] : $existingAnimalRecord['picture_data'];
+        $animalName = $data['name'] ;
+        $animalSpecies = $data['species'] ;
+        $animalGender = $data['gender'] ;
+        $animalBirthDate = $data['birth_date'] ;
+        $animalDescription = $data['description'] ;
+        $animalHealthStatus = $data['health_status'] ;
+        $animalAdoptionFee = $data['adoption_fee'] ;
+        $animalAdoptionStatus = $data['adoption_status'] ;
+        $animalPictureBinaryData = $data['picture_data'] ;
 
         $updateAnimalQuery = "
             UPDATE {$this->animalTableName}
@@ -210,11 +155,7 @@ class ItemModel{
         $affectedRows = $updateAnimalStatement->affected_rows;
         $updateAnimalStatement->close();
 
-        if ($affectedRows === 0) {
-            return $this->fetchAnimalRecordById($animalId);
-        }
-
-        return $this->fetchAnimalRecordById($animalId);
+        return true;
     }
 
     public function deleteAnimalRecordById($id){

@@ -38,7 +38,6 @@ if (($requestMethod === 'POST' && $requestPath === '/delete') || ($requestMethod
 }
 
 $normalizedRequestPath = rtrim($requestPath, '/') ?: '/';
-$resolvedStaticAssetPath = __DIR__ . '/public' . $normalizedRequestPath;
 
 
 if ($requestMethod === 'GET' && ($normalizedRequestPath === '/' || $normalizedRequestPath === '/index.php')) {
