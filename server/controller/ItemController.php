@@ -19,7 +19,23 @@ class ItemController{
             return;
         }
 
-        $animals = $animalRecords;
+        $animals = array_map(function ($animal) {
+            if (!empty($animal['birth_date'])) {
+                $birthDate = new DateTime($animal['birth_date']);
+                $today = new DateTime();
+                $ageInterval = $today->diff($birthDate);
+
+                if ($ageInterval->y > 0) {
+                    $animal['age'] = $ageInterval->y . ($ageInterval->y === 1 ? ' year' : ' years');
+                } else {
+                    $animal['age'] = $ageInterval->m . ($ageInterval->m === 1 ? ' month' : ' months');
+                }
+            } else {
+                $animal['age'] = 'Unknown';
+            }
+
+            return $animal;
+        }, $animalRecords);
         require __DIR__ . '/../../public/index.php';
     }
 

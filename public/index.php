@@ -100,7 +100,7 @@
               <td class="table__td"><?php echo $animal['gender'] ?></td>
               <td class="table__td"><?php echo $animal['age'] ?></td>
               <td class="table__td">
-                <span class="badge badge--health-<?php echo $animal['health_class'] ?>">
+                <span class="badge badge--health-<?php echo $animal['health_status'] ?>">
                   <?php echo $animal['health_status'] ?>
                 </span>
               </td>

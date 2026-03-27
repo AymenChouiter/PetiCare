@@ -320,11 +320,11 @@ body.no-scroll {
 }
 
 /* Health Status */
-.badge--health-healthy {
+.badge--health-HEALTHY {
   color: var(--badge-healthy);
   background: color-mix(in srgb, var(--badge-healthy) 12%, white);
 }
-.badge--health-under-treatment {
+.badge--health-UNDER_TREATMENT {
   color: var(--badge-treatment);
   background: color-mix(in srgb, var(--badge-treatment) 12%, white);
 }
