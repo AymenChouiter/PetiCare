@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../database/database.php';
 
 class ItemModel{
     private mysqli $databaseConnection;
-    private string $animalTableName = '`animal`';
+    private string $animalTableName = '`animals`';
 
     public function __construct(){
         global $conn;

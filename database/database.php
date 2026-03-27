@@ -2,7 +2,7 @@
 $databaseServerHostName = "localhost";
 $databaseUsername = "root";
 $databasePassword = "";
-$databaseSchemaName = "animal-care-center";
+$databaseSchemaName = "peticare_py";
 $conn = null;
 
 try{
@@ -17,7 +17,7 @@ try{
 }
 /**
  * this is the database schema :
- * CREATE TABLE animal (
+ * CREATE TABLE animals (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
       species VARCHAR(100) NOT NULL,
