@@ -1,10 +1,4 @@
 RewriteEngine On
-
-RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
-RewriteRule ^(.*)$ public/$1 [L]
-
-# 2. إذا لم يكن الطلب لملف حقيقي (لا في الجذر ولا في public)
-# فقم بتوجيه الطلب لملف التشغيل الرئيسي app.php
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ app.php [QSA,L]
+RewriteBase /
+Options -Indexes
+RewriteRule ^ index.php [QSA,L]
