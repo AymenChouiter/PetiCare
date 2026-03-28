@@ -39,27 +39,9 @@ class ItemController{
         require __DIR__ . '/../../public/index.php';
     }
 
-    private function extractIncomingRequestData(): array{
-        $incomingRequestContentType = $_SERVER['CONTENT_TYPE'] ?? '';
-
-        if (stripos($incomingRequestContentType, 'application/json') !== false) {
-            $rawRequestBodyContent = file_get_contents('php://input');
-            if (!empty($rawRequestBodyContent)) {
-                $decodedJsonRequestBody = json_decode($rawRequestBodyContent, true);
-                if (is_array($decodedJsonRequestBody)) {
-                    return $decodedJsonRequestBody;
-                }
-            }
-            return [];
-        }
-
-        return $_POST ?? [];
-    }
 
     private function extractUploadedAnimalPictureBinaryData(): ?string{
-        if (!isset($_FILES['picture']) || !is_array($_FILES['picture'])) {
-            return null;
-        }
+        if (!isset($_FILES['picture'])) return null;
 
         if (!empty($_FILES['picture']['tmp_name']) && is_uploaded_file($_FILES['picture']['tmp_name'])) {
             $uploadedPictureBinaryContent = file_get_contents($_FILES['picture']['tmp_name']);
@@ -71,8 +53,7 @@ class ItemController{
 
 
     public function createAnimalRecord(): void{
-        header('Content-Type: application/json');
-        $requestData = $this->extractIncomingRequestData();
+        $requestData = $_POST;
 
         $requiredFields = ['name', 'species', 'gender', 'birth_date'];
         foreach ($requiredFields as $requiredFieldName) {
@@ -107,15 +88,11 @@ class ItemController{
             return;
         }
 
-        http_response_code(201);
-        echo json_encode([
-            'status' => 'success',
-        ]);
+        $this->renderAnimalManagementPage();
     }
 
     public function updateAnimalRecord(): void{
-        header('Content-Type: application/json');
-        $requestData = $this->extractIncomingRequestData();
+        $requestData = $_POST;
 
         $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
         if (empty($animalId)) {
@@ -181,15 +158,11 @@ class ItemController{
             return;
         }
 
-        http_response_code(200);
-        echo json_encode([
-            'status' => 'success',
-        ]);
+        $this->renderAnimalManagementPage();
     }
 
     public function deleteAnimalRecord(): void{
-        header('Content-Type: application/json');
-        $requestData = $this->extractIncomingRequestData();
+        $requestData = $_POST;
         $animalId = $requestData['id'] ?? ($_GET['id'] ?? null);
 
         if (empty($animalId)) {
@@ -221,10 +194,6 @@ class ItemController{
             return;
         }
 
-        http_response_code(200);
-        echo json_encode([
-            'status'  => 'success',
-            'message' => 'Animal deleted successfully',
-        ]);
+        $this->renderAnimalManagementPage();
     }
 }
