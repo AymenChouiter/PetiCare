@@ -1,72 +1,126 @@
-const modalAddAnimal = document.querySelector('[data-modal="add"]');
-const btnOpenAddModal = document.querySelector('[data-btn-open="add"]');
-const btnCloseAddModal = document.querySelector('[data-btn-close="add"]');
+"use strict";
 
-const openAddAnimalModal = () => {
-  modalAddAnimal.showModal();
-  document.body.classList.add("no-scroll");
+const tableBody = document.getElementById("table-body");
+const animalEditor = document.getElementById("animal-editor");
+const editorTitle = document.getElementById("editor-title");
+const btnAddAnimal = document.getElementById("btn-add-animal");
+const btnCloseEditor = document.getElementById("btn-close-editor");
+const animalForm = document.getElementById("animal-form");
+const btnCancel = document.getElementById("btn-cancel-submit");
+const previewImg = document.getElementById("edit-preview-image");
+
+const fillForm = (animalData) => {
+  const { name, species, gender, birth, health, adoption, fee, desc, pic } =
+    animalData;
+
+  animalForm.querySelector('[name="name"]').value = name ?? "";
+  animalForm.querySelector('[name="species"]').value = species ?? "";
+  animalForm.querySelector('[name="gender"]').value = gender ?? "";
+  animalForm.querySelector('[name="birth_date"]').value = birth ?? "";
+  animalForm.querySelector('[name="health_status"]').value = health ?? "";
+  animalForm.querySelector('[name="adoption_status"]').value = adoption ?? "";
+  animalForm.querySelector('[name="adoption_fee"]').value =
+    fee?.replace("$", "") ?? "";
+  animalForm.querySelector('[name="description"]').value = desc ?? "";
+
+  previewImg.src = pic ?? "";
 };
 
-const closeAddAnimalModal = () => {
-  modalAddAnimal.close();
+// >>>>>>>>>>>>>>>>>>>>>>>>> Editor
+const openEditor = (mode, animalData) => {
+  animalEditor.showModal();
+  document.body.classList.add("no-scroll");
+
+  if (mode === "edit" && animalData) {
+    editorTitle.textContent = "Edit Animal";
+    previewImg.parentElement.style.display = "block";
+    fillForm(animalData);
+
+    animalForm.dataset.mode = "edit";
+    animalForm.dataset.id = animalData.id;
+  } else {
+    editorTitle.textContent = "Add New Animal";
+
+    animalForm.dataset.mode = "add";
+    delete animalForm.dataset.id;
+  }
+};
+
+const closeEditor = () => {
+  previewImg.src = "";
+  previewImg.parentElement.style.display = "none";
+  animalForm.reset();
+  animalEditor.close();
   document.body.classList.remove("no-scroll");
 };
 
-btnOpenAddModal.addEventListener("click", openAddAnimalModal);
-btnCloseAddModal.addEventListener("click", closeAddAnimalModal);
+// >>>>>>>>>>>>>>>>>>>>>>>>> Animal operations
+const handleAnimalFormSubmit = async (e) => {
+  e.preventDefault();
 
-const modalsUpdate = document.querySelectorAll('[data-modal="update"]');
-const btnsOpenUpdate = document.querySelectorAll('[data-btn-open="update"]');
-const btnsCloseUpdate = document.querySelectorAll('[data-btn-close="update"]');
+  const animalData = new FormData(e.target);
+  const mode = animalForm.dataset.mode;
+  const id = animalForm.dataset.id;
 
-const modalUpdateAnimal = document.querySelector('[data-modal="update"]');
+  const requiredFields = [
+    "name",
+    "species",
+    "gender",
+    "birth_date",
+    "health_status",
+    "adoption_status",
+    "adoption_fee",
+  ];
+  const missing = requiredFields.some((field) => !animalData.get(field));
 
-const openUpdateAnimalModal = () => {
-  const button = event.currentTarget;
+  if (missing) {
+    alert("Please fill in all required fields!");
+    return;
+  }
 
-  const pic = button.getAttribute('data-pic');
-  const id = button.getAttribute('data-id');
-  const name = button.getAttribute('data-name');
-  const species = button.getAttribute('data-species');
-  const gender = button.getAttribute('data-gender');
-  const birth = button.getAttribute('data-birth');
-  const health = button.getAttribute('data-health');
-  const adoption = button.getAttribute('data-adopation');
-  const fee = button.getAttribute('data-fee');
-  const description = button.getAttribute('data-description');
+  const url = mode === "edit" ? `/update?id=${id}` : "/add";
 
-  document.getElementById("update-animalId").value = id;
-  document.getElementById('update-preview').src = "data:image/png;base64," + pic;
+  try {
+    const res = await fetch(url, { method: "POST", body: animalData });
 
-  modalUpdateAnimal.querySelector('[name="name"]').value = name;
-  modalUpdateAnimal.querySelector('[name="species"]').value = species;
-  modalUpdateAnimal.querySelector('[name="gender"]').value = gender;
-  modalUpdateAnimal.querySelector('[name="birth_date"]').value = birth;
-  modalUpdateAnimal.querySelector('[name="health_status"]').value = health;
-  modalUpdateAnimal.querySelector('[name="adoption_status"]').value = adoption;
-  modalUpdateAnimal.querySelector('[name="adoption_fee"]').value = fee;
-  modalUpdateAnimal.querySelector('[name="description"]').value = description;
+    if (!res.ok) {
+      throw new Error("Request failed");
+    }
 
-  modalUpdateAnimal.showModal();
-  document.body.classList.add("no-scroll");
+    closeEditor();
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again!");
+  }
 };
 
-const closeUpdateAnimalModal = () => {
-  modalUpdateAnimal.close();
-  document.body.classList.remove("no-scroll");
+const handleDeleteAnimal = async (id) => {
+  try {
+    const res = await fetch(`/delete?id=${id}`, { method: "DELETE" });
+    const json = await res.json();
+
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again!");
+  }
 };
 
-btnsOpenUpdate.forEach(btn => {
-  btn.addEventListener("click", openUpdateAnimalModal);
-});
+const handleTableAction = (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
 
-btnsCloseUpdate.forEach(btn => {
-  btn.addEventListener("click", closeUpdateAnimalModal);
-});
+  const action = btn.dataset.action;
+  const row = btn.closest("tr");
+  const animalData = row.dataset;
 
-const deleteThis = async (reco) => {
-  let input = document.getElementById('delete-animalId');
-  let submitButton = document.getElementById('del');
-  input.value = reco.value;
-  await submitButton.click();
+  if (action === "edit") openEditor("edit", animalData);
+  if (action === "delete") handleDeleteAnimal(animalData.id);
 };
+
+btnAddAnimal.addEventListener("click", openEditor);
+btnCloseEditor.addEventListener("click", closeEditor);
+btnCancel.addEventListener("click", closeEditor);
+animalForm.addEventListener("submit", handleAnimalFormSubmit);
+tableBody.addEventListener("click", handleTableAction);

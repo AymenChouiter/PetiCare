@@ -1,18 +1,16 @@
 <?php
-$databaseServerHostName = "localhost";
-$databaseUsername = "root";
-$databasePassword = "";
-$databaseSchemaName = "peticare_py";
-$conn = null;
+$host = "localhost";
+$userName = "root";
+$password = "";
+$dbName = "peticare_db";
 
-try{
+try {
     $conn = mysqli_connect(
-        $databaseServerHostName,
-        $databaseUsername,
-        $databasePassword,
-        $databaseSchemaName,
+        $host,
+        $userName,
+        $password,
+        $dbName,
     );
-}catch(mysqli_sql_exception){
+} catch (mysqli_sql_exception) {
     echo "Could not connect";
 }
-?>

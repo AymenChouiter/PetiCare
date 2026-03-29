@@ -32,7 +32,7 @@
         Manage all animals in the PetiCare adoption center
       </p>
     </div>
-    <button class="btn btn--primary" type="button" data-btn-open="add">
+    <button class="btn btn--primary" type="button" id="btn-add-animal">
       <iconify-icon icon="material-symbols:add-rounded"></iconify-icon>
       <span>Add Animal</span>
     </button>
@@ -77,9 +77,14 @@
             <th class="table__th table__th--center">Actions</th>
           </tr>
         </thead>
-        <tbody class="table__body">
+        <tbody class="table__body" id="table-body">
           <?php foreach ($animals as $animal): ?>
-            <tr class="table__row">
+            <tr class="table__row" data-id="<?= $animal['id'] ?>" data-name="<?= $animal['name'] ?>"
+              data-species="<?= $animal['species'] ?>" data-gender="<?= $animal['gender'] ?>"
+              data-birth="<?= $animal['birth_date'] ?>" data-health="<?= $animal['health_status'] ?>"
+              data-fee="<?= $animal['adoption_fee'] ?>" data-adoption="<?= $animal['adoption_status'] ?>"
+              data-desc="<?= $animal['description'] ?>"
+              data-pic="data:image/jpeg;base64,<?= base64_encode($animal['picture_data']) ?>">
               <td class="table__td">
                 <div class="table__animal-info">
                   <div class="table__avatar">
@@ -97,19 +102,19 @@
                 </div>
               </td>
               <td class="table__td"><?php echo $animal['species'] ?></td>
-              <td class="table__td"><?php echo $animal['gender'] ?></td>
+              <td class="table__td"><?php echo $animal['gender_display'] ?></td>
               <td class="table__td"><?php echo $animal['age'] ?></td>
               <td class="table__td">
-                <span class="badge badge--health-<?php echo $animal['health_status'] ?>">
-                  <?php echo strtolower(str_replace('_', ' ', $animal['health_status'])); ?>
+                <span class="badge badge--health-<?php echo $animal['health_class'] ?>">
+                  <?php echo $animal['health_display'] ?>
                 </span>
               </td>
               <td class="table__td table__td--bold">
                 <?php echo $animal['adoption_fee'] ?>
               </td>
               <td class="table__td">
-                <span class="badge badge--status-<?php echo strtolower($animal['adoption_status']) ?>">
-                  <?php echo $animal['adoption_status'] ?>
+                <span class="badge badge--status-<?php echo $animal['adoption_class'] ?>">
+                  <?php echo $animal['adoption_display'] ?>
                 </span>
               </td>
               <td class="table__td">
@@ -120,23 +125,10 @@
               </td>
               <td class="table__td">
                 <div class="table__actions">
-                  <button class="action-btn action-btn--edit"
-                          aria-label="Edit" 
-                          data-btn-open="update"
-                          data-pic="<?php echo base64_encode($animal['picture_data']) ?>"
-                          data-id="<?php echo $animal['id'] ?>" 
-                          data-name="<?php echo $animal['name'] ?>" 
-                          data-species="<?php echo $animal['species'] ?>" 
-                          data-gender="<?php echo $animal['gender'] ?>" 
-                          data-birth="<?php echo $animal['birth_date'] ?>" 
-                          data-health="<?php echo $animal['health_status'] ?>" 
-                          data-adopation="<?php echo $animal['adoption_status'] ?>" 
-                          data-fee="<?php echo $animal['adoption_fee'] ?>" 
-                          data-Description="<?php echo $animal['description'] ?>"
-                  >
+                  <button class="action-btn action-btn--edit" aria-label="Edit" data-action="edit">
                     <iconify-icon icon="material-symbols:edit-outline-rounded"></iconify-icon>
                   </button>
-                  <button class="action-btn action-btn--delete" aria-label="Delete" value="<?php echo $animal['id'] ?>" onclick="deleteThis(this)">
+                  <button class="action-btn action-btn--delete" aria-label="Delete" data-action="delete">
                     <iconify-icon icon="material-symbols:delete-outline"></iconify-icon>
                   </button>
                 </div>
@@ -147,13 +139,12 @@
       </table>
     </div>
   </div>
-  <?php 
-    require './public/tableTool.php';
-  ?>
   <footer class="footer">
     <p>Made with &#9825; by Farouk & Aymen</p>
     <p>&copy;2025/2026 WEB course project</p>
   </footer>
+
+  <?php require './public/AnimalEditor.php'; ?>
   <script src="js/logic.js" defer></script>
 </body>
 
