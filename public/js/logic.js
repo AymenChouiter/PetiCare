@@ -1,13 +1,20 @@
 "use strict";
 
 const tableBody = document.getElementById("table-body");
+const btnAddAnimal = document.getElementById("btn-add-animal");
+
 const animalEditor = document.getElementById("animal-editor");
 const editorTitle = document.getElementById("editor-title");
-const btnAddAnimal = document.getElementById("btn-add-animal");
 const btnCloseEditor = document.getElementById("btn-close-editor");
-const animalForm = document.getElementById("animal-form");
-const btnCancel = document.getElementById("btn-cancel-submit");
 const previewImg = document.getElementById("edit-preview-image");
+const btnRemoveImg = document.getElementById("btn-remove-img");
+const animalForm = document.getElementById("animal-form");
+const pictureInput = document.getElementById("animal-picture");
+const btnCancel = document.getElementById("btn-cancel-submit");
+
+const searchInput = document.getElementById("search-input");
+const speciesSelect = document.getElementById("species-filter");
+const adoptionStatusSelect = document.getElementById("adoption-filter");
 
 const fillForm = (animalData) => {
   const { name, species, gender, birth, health, adoption, fee, desc, pic } =
@@ -23,7 +30,13 @@ const fillForm = (animalData) => {
     fee?.replace("$", "") ?? "";
   animalForm.querySelector('[name="description"]').value = desc ?? "";
 
-  previewImg.src = pic ?? "";
+  if (pic) {
+    previewImg.src = pic;
+    previewImg.parentElement.style.display = "block";
+  } else {
+    previewImg.src = "";
+    previewImg.parentElement.style.display = "none";
+  }
 };
 
 // >>>>>>>>>>>>>>>>>>>>>>>>> Editor
@@ -33,8 +46,9 @@ const openEditor = (mode, animalData) => {
 
   if (mode === "edit" && animalData) {
     editorTitle.textContent = "Edit Animal";
-    previewImg.parentElement.style.display = "block";
     fillForm(animalData);
+    if (previewImg.getAttribute("src"))
+      previewImg.parentElement.style.display = "block";
 
     animalForm.dataset.mode = "edit";
     animalForm.dataset.id = animalData.id;
@@ -54,6 +68,28 @@ const closeEditor = () => {
   document.body.classList.remove("no-scroll");
 };
 
+// >>>>>>>>>>>>>>>>>>>>>>>>> Search and Filter
+const applyFilters = () => {
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedSpecies = speciesSelect.value.toLowerCase();
+  const selectedAdoption = adoptionStatusSelect.value;
+
+  const rows = tableBody.querySelectorAll("tr");
+
+  rows.forEach((row) => {
+    const name = row.dataset.name?.toLowerCase() || "";
+    const species = row.dataset.species?.toLowerCase() || "";
+    const adoption = row.dataset.adoption || "";
+
+    const matchesSearch = name.includes(searchTerm);
+    const matchesSpecies = !selectedSpecies || species === selectedSpecies;
+    const matchesAdoption = !selectedAdoption || adoption === selectedAdoption;
+
+    row.style.display =
+      matchesSearch && matchesSpecies && matchesAdoption ? "" : "none";
+  });
+};
+
 // >>>>>>>>>>>>>>>>>>>>>>>>> Animal operations
 const handleAnimalFormSubmit = async (e) => {
   e.preventDefault();
@@ -61,6 +97,11 @@ const handleAnimalFormSubmit = async (e) => {
   const animalData = new FormData(e.target);
   const mode = animalForm.dataset.mode;
   const id = animalForm.dataset.id;
+
+  const hasNoImage =
+    !previewImg.getAttribute("src") && !animalData.get("picture").size;
+
+  if (mode === "edit" && hasNoImage) animalData.set("delete_picture", "1");
 
   const requiredFields = [
     "name",
@@ -119,8 +160,28 @@ const handleTableAction = (e) => {
   if (action === "delete") handleDeleteAnimal(animalData.id);
 };
 
+searchInput.addEventListener("input", applyFilters);
+speciesSelect.addEventListener("change", applyFilters);
+adoptionStatusSelect.addEventListener("change", applyFilters);
 btnAddAnimal.addEventListener("click", openEditor);
 btnCloseEditor.addEventListener("click", closeEditor);
 btnCancel.addEventListener("click", closeEditor);
 animalForm.addEventListener("submit", handleAnimalFormSubmit);
 tableBody.addEventListener("click", handleTableAction);
+btnRemoveImg.addEventListener("click", () => {
+  previewImg.src = "";
+  previewImg.parentElement.style.display = "none";
+});
+pictureInput.addEventListener("change", () => {
+  const file = pictureInput.files[0];
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    previewImg.src = e.target.result;
+    previewImg.parentElement.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});

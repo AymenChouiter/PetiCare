@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $userName = "root";
-$password = "";
+$password = "farouk1975";
 $dbName = "peticare_db";
 
 try {

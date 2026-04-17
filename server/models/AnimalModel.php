@@ -84,55 +84,81 @@ class animalModel
 
     public function updateAnimal(int $id, array $data)
     {
-        $qry = "
-        UPDATE {$this->animalTableName}
-        SET
-            name = ?,
-            species = ?,
-            gender = ?,
-            birth_date = ?,
-            description = ?,
-            health_status = ?,
-            adoption_fee = ?,
-            adoption_status = ?,
-            picture_data = COALESCE(?, picture_data)
-        WHERE id = ?
-    ";
-        $stmt = $this->dbConnection->prepare($qry);
+        $check = $this->dbConnection->prepare("SELECT id FROM {$this->animalTableName} WHERE id = ?");
+        $check->bind_param('i', $id);
+        $check->execute();
+        $check->store_result();
 
-        if (!$stmt)
-            return false;
+        if ($check->num_rows === 0) {
+            $check->close();
+            return null;
+        }
+        $check->close();
 
         $picture = $data['picture_data'] ?? null;
+        $deletePicture = ($picture === '');
 
-        if (
-            !$stmt->bind_param(
-                'sssssssssi',
-                $data['name'],
-                $data['species'],
-                $data['gender'],
-                $data['birth_date'],
-                $data['description'],
-                $data['health_status'],
-                $data['adoption_fee'],
-                $data['adoption_status'],
-                $picture,
-                $id
-            )
-        ) {
-            $stmt->close();
-            return false;
+        if ($deletePicture) {
+            $qry = "UPDATE {$this->animalTableName}
+                SET name=?, species=?, gender=?, birth_date=?, description=?,
+                    health_status=?, adoption_fee=?, adoption_status=?,
+                    picture_data = NULL
+                WHERE id=?";
+            $stmt = $this->dbConnection->prepare($qry);
+            if (!$stmt)
+                return false;
+            if (
+                !$stmt->bind_param(
+                    'ssssssssi',
+                    $data['name'],
+                    $data['species'],
+                    $data['gender'],
+                    $data['birth_date'],
+                    $data['description'],
+                    $data['health_status'],
+                    $data['adoption_fee'],
+                    $data['adoption_status'],
+                    $id
+                )
+            ) {
+                $stmt->close();
+                return false;
+            }
+        } else {
+            $qry = "UPDATE {$this->animalTableName}
+                SET name=?, species=?, gender=?, birth_date=?, description=?,
+                    health_status=?, adoption_fee=?, adoption_status=?,
+                    picture_data = COALESCE(?, picture_data)
+                WHERE id=?";
+            $stmt = $this->dbConnection->prepare($qry);
+            if (!$stmt)
+                return false;
+            if (
+                !$stmt->bind_param(
+                    'sssssssssi',
+                    $data['name'],
+                    $data['species'],
+                    $data['gender'],
+                    $data['birth_date'],
+                    $data['description'],
+                    $data['health_status'],
+                    $data['adoption_fee'],
+                    $data['adoption_status'],
+                    $picture,
+                    $id
+                )
+            ) {
+                $stmt->close();
+                return false;
+            }
         }
 
         if (!$stmt->execute()) {
             $stmt->close();
             return false;
         }
-
-        $affected = $stmt->affected_rows;
         $stmt->close();
-
-        return $affected === 0 ? null : true;
+        return true;
     }
 
     public function deleteAnimal($id)

@@ -138,7 +138,16 @@ class AnimalController
     {
         $animalData['description'] = !empty($animalData['description']) ? $animalData['description'] : null;
         $animalData['adoption_fee'] = isset($animalData['adoption_fee']) ? (float) $animalData['adoption_fee'] : 0.00;
-        $animalData['picture_data'] = $this->getUploadedAnimalPicture();
+
+        $picture = $this->getUploadedAnimalPicture();
+        if ($picture !== null)
+            $animalData['picture_data'] = $picture;
+        elseif (!empty($animalData['delete_picture']))
+            $animalData['picture_data'] = '';
+        else
+            $animalData['picture_data'] = null;
+
+
         return $animalData;
     }
 
