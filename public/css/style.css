@@ -498,3 +498,65 @@ footer p:first-child {
   font-size: 1.25rem;
   margin-bottom: 0.25rem;
 }
+
+/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Auth */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: var(--border);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.auth-card__brand {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.auth-card__logo {
+  width: 72px;
+  margin-inline: auto;
+}
+
+.auth-card__title {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.auth-card__desc {
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.auth-card__alert {
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, white);
+  background: color-mix(in srgb, var(--danger) 8%, white);
+  color: var(--danger-dark);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form__submit {
+  width: 100%;
+  justify-content: center;
+}
