@@ -54,7 +54,7 @@ class AnimalController
 
             $fee = (float) $animal['adoption_fee'];
             $animal['adoption_fee'] = $fee > 0
-                ? '$' . ($fee == floor($fee) ? number_format($fee, 0) : number_format($fee, 2))
+                ? ($fee == floor($fee) ? number_format($fee, 0) : number_format($fee, 2)) . ' DA'
                 : 'Free';
 
             $animal['created_at'] = date('M d, Y', strtotime($animal['created_at']));

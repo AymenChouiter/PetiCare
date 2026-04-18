@@ -73,13 +73,12 @@
             <th class="table__th">Health</th>
             <th class="table__th">Fee</th>
             <th class="table__th">Status</th>
-            <th class="table__th">Timeline</th>
             <th class="table__th table__th--center">Actions</th>
           </tr>
         </thead>
         <tbody class="table__body" id="table-body">
           <?php foreach ($animals as $animal): ?>
-            <tr class="table__row" data-id="<?= $animal['id'] ?>" data-name="<?= $animal['name'] ?>"
+            <tr class="table__row" title="Cr: <?= $animal['created_at'] ?> &#10;Up: <?= $animal['updated_at'] ?>" data-id="<?= $animal['id'] ?>" data-name="<?= $animal['name'] ?>"
               data-species="<?= $animal['species'] ?>" data-gender="<?= $animal['gender'] ?>"
               data-birth="<?= $animal['birth_date'] ?>" data-health="<?= $animal['health_status'] ?>"
               data-fee="<?= $animal['adoption_fee'] ?>" data-adoption="<?= $animal['adoption_status'] ?>"
@@ -116,12 +115,6 @@
                 <span class="badge badge--status-<?php echo $animal['adoption_class'] ?>">
                   <?php echo $animal['adoption_display'] ?>
                 </span>
-              </td>
-              <td class="table__td">
-                <div class="table__timeline">
-                  <span>Cr: <?php echo $animal['created_at'] ?> </span>
-                  <span>Up: <?php echo $animal['updated_at'] ?> </span>
-                </div>
               </td>
               <td class="table__td">
                 <div class="table__actions">

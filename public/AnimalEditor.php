@@ -6,7 +6,8 @@
     </button>
   </div>
   <div class="animal-picture">
-    <img src="" alt="Animal picture" id="edit-preview-image">
+    <div id="skeleton" class="skeleton-loader"></div>
+    <img src="" alt="" id="edit-preview-image" style="display: none;">
   </div>
   <form enctype="multipart/form-data" class="editor__form" id="animal-form">
     <div class="form-group">

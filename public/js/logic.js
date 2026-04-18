@@ -8,8 +8,22 @@ const btnCloseEditor = document.getElementById("btn-close-editor");
 const animalForm = document.getElementById("animal-form");
 const btnCancel = document.getElementById("btn-cancel-submit");
 const previewImg = document.getElementById("edit-preview-image");
+const skeleton = document.getElementById('skeleton');
+const animalPictureInput = document.getElementById("animal-picture");
 
-const fillForm = (animalData) => {
+const setPreviewState = (mode, src = "") => {
+  previewImg.src = src;
+  if (mode === "image") {
+    previewImg.style.display = "block";
+    skeleton.style.display = "none";
+    return;
+  }
+
+  previewImg.style.display = "none";
+  skeleton.style.display = "block";
+};
+
+const fillForm = (animalData = {}) => {
   const { name, species, gender, birth, health, adoption, fee, desc, pic } =
     animalData;
 
@@ -20,34 +34,51 @@ const fillForm = (animalData) => {
   animalForm.querySelector('[name="health_status"]').value = health ?? "";
   animalForm.querySelector('[name="adoption_status"]').value = adoption ?? "";
   animalForm.querySelector('[name="adoption_fee"]').value =
-    fee?.replace("$", "") ?? "";
+    (fee ?? "").replace(" DA", "").replace(",", "") ?? "";
   animalForm.querySelector('[name="description"]').value = desc ?? "";
+  if (pic) {
+    setPreviewState("image", pic);
+  } else {
+    setPreviewState("skeleton");
+  }
+};
 
-  previewImg.src = pic ?? "";
+const fillimg = (inp) => {
+  if (inp.files && inp.files[0]) {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      setPreviewState("image", e.target.result);
+    };
+    reader.readAsDataURL(inp.files[0]);
+  }else {
+    setPreviewState("skeleton");
+  }
 };
 
 // >>>>>>>>>>>>>>>>>>>>>>>>> Editor
 const openEditor = (mode, animalData) => {
+  const resolvedMode = mode === "edit" ? "edit" : "add";
   animalEditor.showModal();
   document.body.classList.add("no-scroll");
+  previewImg.parentElement.style.display = "block";
+  animalForm.reset();
+  setPreviewState("skeleton");
 
-  if (mode === "edit" && animalData) {
+  if (resolvedMode === "edit" && animalData) {
     editorTitle.textContent = "Edit Animal";
-    previewImg.parentElement.style.display = "block";
-    fillForm(animalData);
-
     animalForm.dataset.mode = "edit";
     animalForm.dataset.id = animalData.id;
+    fillForm(animalData);
   } else {
     editorTitle.textContent = "Add New Animal";
-
     animalForm.dataset.mode = "add";
     delete animalForm.dataset.id;
   }
 };
 
 const closeEditor = () => {
-  previewImg.src = "";
+  setPreviewState("skeleton");
   previewImg.parentElement.style.display = "none";
   animalForm.reset();
   animalEditor.close();
@@ -119,8 +150,9 @@ const handleTableAction = (e) => {
   if (action === "delete") handleDeleteAnimal(animalData.id);
 };
 
-btnAddAnimal.addEventListener("click", openEditor);
+btnAddAnimal.addEventListener("click", () => openEditor("add"));
 btnCloseEditor.addEventListener("click", closeEditor);
 btnCancel.addEventListener("click", closeEditor);
 animalForm.addEventListener("submit", handleAnimalFormSubmit);
 tableBody.addEventListener("click", handleTableAction);
+animalPictureInput.addEventListener("change", (event) => fillimg(event.target));
