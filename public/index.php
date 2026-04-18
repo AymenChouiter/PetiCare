@@ -43,17 +43,17 @@
         <iconify-icon icon="mdi:magnify" aria-hidden="true" class="toolbar__search-icon"></iconify-icon>
 
         <input type="text" name="search" placeholder="Search animals by name..." class="toolbar__search-input"
-          autocomplete="off" />
+          autocomplete="off" id="search-input" />
       </div>
-      <select name="species" class="toolbar__select">
+      <select name="species" class="toolbar__select" id="species-filter">
         <option value="">All Species</option>
-        <option value="dog">Dog</option>
-        <option value="cat">Cat</option>
-        <option value="bird">Bird</option>
-        <option value="rabbit">Rabbit</option>
-        <option value="other">Other</option>
+        <option value="Dog">Dog</option>
+        <option value="Cat">Cat</option>
+        <option value="Bird">Bird</option>
+        <option value="Rabbit">Rabbit</option>
+        <option value="Other">Other</option>
       </select>
-      <select name="adoption_status" class="toolbar__select">
+      <select name="adoption_status" class="toolbar__select" id="adoption-filter">
         <option value="">All Adoption Status</option>
         <option value="AVAILABLE">Available</option>
         <option value="RESERVED">Reserved</option>
@@ -83,7 +83,7 @@
               data-birth="<?= $animal['birth_date'] ?>" data-health="<?= $animal['health_status'] ?>"
               data-fee="<?= $animal['adoption_fee'] ?>" data-adoption="<?= $animal['adoption_status'] ?>"
               data-desc="<?= $animal['description'] ?>"
-              data-pic="data:image/jpeg;base64,<?= base64_encode($animal['picture_data']) ?>">
+              data-pic="<?= $animal['picture_data'] ? 'data:image/jpeg;base64,' . base64_encode($animal['picture_data']) : '' ?>">
               <td class="table__td">
                 <div class="table__animal-info">
                   <div class="table__avatar">
