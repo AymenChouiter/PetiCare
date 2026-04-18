@@ -1,6 +1,14 @@
 CREATE DATABASE IF NOT EXISTS peticare_db;
 USE peticare_db;
 
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS animals (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -16,7 +24,10 @@ CREATE TABLE IF NOT EXISTS animals (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- SEEDING TEST DATA
+-- SEEDING DATA
+INSERT INTO admins (username, email, password) 
+VALUES ('farouk_aymen', 'admin@peticare.dz', '$2y$12$ct5JXI6ZIPfJMnFslWY1COdazpI3510yV4KK9WBpndYip.wBv42xa');
+
 INSERT INTO animals (
   name, 
   species, 

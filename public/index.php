@@ -22,6 +22,7 @@
       <div class="header__brand">
         <img src="/assets/logo.png" alt="Logo" class="header__logo" />
         <h1 class="header__title">Admin Dashboard</h1>
+        <a href="/logout">Logout</a>
       </div>
     </div>
   </header>
@@ -78,11 +79,11 @@
         </thead>
         <tbody class="table__body" id="table-body">
           <?php foreach ($animals as $animal): ?>
-            <tr class="table__row" title="Cr: <?= $animal['created_at'] ?> &#10;Up: <?= $animal['updated_at'] ?>" data-id="<?= $animal['id'] ?>" data-name="<?= $animal['name'] ?>"
-              data-species="<?= $animal['species'] ?>" data-gender="<?= $animal['gender'] ?>"
-              data-birth="<?= $animal['birth_date'] ?>" data-health="<?= $animal['health_status'] ?>"
-              data-fee="<?= $animal['adoption_fee'] ?>" data-adoption="<?= $animal['adoption_status'] ?>"
-              data-desc="<?= $animal['description'] ?>"
+            <tr class="table__row" title="Cr: <?= $animal['created_at'] ?> &#10;Up: <?= $animal['updated_at'] ?>"
+              data-id="<?= $animal['id'] ?>" data-name="<?= $animal['name'] ?>" data-species="<?= $animal['species'] ?>"
+              data-gender="<?= $animal['gender'] ?>" data-birth="<?= $animal['birth_date'] ?>"
+              data-health="<?= $animal['health_status'] ?>" data-fee="<?= $animal['adoption_fee'] ?>"
+              data-adoption="<?= $animal['adoption_status'] ?>" data-desc="<?= $animal['description'] ?>"
               data-pic="<?= $animal['picture_data'] ? 'data:image/jpeg;base64,' . base64_encode($animal['picture_data']) : '' ?>">
               <td class="table__td">
                 <div class="table__animal-info">

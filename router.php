@@ -19,7 +19,7 @@ if (php_sapi_name() === 'cli-server') {
 require_once __DIR__ . '/server/controller/AnimalController.php';
 require_once __DIR__ . '/server/controller/AdminController.php';
 
-$controller = new AnimalController();
+$animalController = new AnimalController();
 $adminController = new AdminController();
 
 if ($method === 'GET' && $path === '/') {
@@ -32,16 +32,16 @@ if ($method === 'GET' && $path === '/') {
     $adminController->logout();
 } else if ($method === 'GET' && $path === '/dashboard') {
     $adminController->requireAuth();
-    $controller->index();
+    $animalController->index();
 } else if ($method === 'POST' && $path === '/add') {
     $adminController->requireAuth();
-    $controller->createAnimal();
+    $animalController->createAnimal();
 } else if ($method === 'POST' && $path === '/update') {
     $adminController->requireAuth();
-    $controller->updateAnimal();
+    $animalController->updateAnimal();
 } else if ($method === 'DELETE' && $path === '/delete') {
     $adminController->requireAuth();
-    $controller->deleteAnimal();
+    $animalController->deleteAnimal();
 } else {
     http_response_code(404);
     header('Content-Type: application/json');
