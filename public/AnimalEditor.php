@@ -5,9 +5,12 @@
       <iconify-icon icon="material-symbols:close-rounded" aria-hidden="true"></iconify-icon>
     </button>
   </div>
-  <div class="animal-picture">
+  <div class="editor__picture">
     <div id="skeleton" class="skeleton-loader"></div>
-    <img src="" alt="" id="edit-preview-image" style="display: none;">
+    <img src="" alt="Animal picture" id="edit-preview-image">
+    <button type="button" class="editor__picture-remove" id="btn-remove-img">
+      <iconify-icon icon="material-symbols:close-rounded" aria-hidden="true"></iconify-icon>
+    </button>
   </div>
   <form enctype="multipart/form-data" class="editor__form" id="animal-form">
     <div class="form-group">
